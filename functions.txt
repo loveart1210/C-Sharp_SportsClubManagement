@@ -1,0 +1,93 @@
+Ứng dụng quản lý câu lạc bộ thể thao
+Số role hệ thống: 2 roles: Admin – User
+1.	Chức năng chung (Áp dụng cho cả admin hệ thống và user)
+1.1. Quản lý trang cá nhân
+-	CRUD Avatar
+-	CRUD Họ tên
+-	CRUD Ngày sinh
+-	CRUD Email
+1.2. Quản lý môn tập, lịch tập cá nhân
+-	Quản lý môn tập cá nhân (CRUD dạng lịch)
+-	Quản lý lịch tập cá nhân (CRUD dạng lịch)
+2.	Chức năng của Admin hệ thống
+2.1. Quản lý user có trên ứng dụng
+2.1.1. Xem thông tin cá nhân user
+-	Xem avatar user
+-	Xem họ tên user
+-	Xem ngày sinh user
+-	Xem email user
+2.1.2. Quản lý tài khoản user
+-	Xem tên đăng nhập của user
+-	Cấp lại password cho user (Admin không có quyền xem mật khẩu user, mật khẩu của user phải được mã hóa)
+2.2. Quản lý team
+2.2.1. Quản lý toàn bộ team có trên ứng dụng
+-	CRUD thành viên trong các team (xem thông tin cá nhân của thành viên, thêm / xóa thành viên)
+-	Sửa role thành viên trong team (sửa member thành role Coach hoặc Member)
+-	CRUD danh sách môn tập
+-	Quản lý buổi tập (CRUD dạng lịch)
+-	CRUD avatar team
+-	CRUD tên team
+-	Quản lý ngày thành lập team (Ngày thành lập team sẽ được tạo tự động ngay khi team được thành lập, nhưng admin có quyền chỉnh sửa này ngày)
+-	Tìm kiếm thành viên trong team (Lọc theo role, môn tập, buổi tập)
+-	Tìm kiếm môn tập (Lọc theo thành viên tham gia, buổi tập)
+-	Quản lý điểm danh (Danh sách điểm danh theo ngày) (Chỉ role Coach mới được thực hiện điểm danh)
+-	CRUD phần hiển thị thông báo / bài viết trong team
+-	Xuất lịch tập trong tuần / tháng / năm
+2.2.2. Quản lý team do mình thành lập
+-	Toàn bộ chức năng của “2.1.1. Quản lý toàn bộ team có trên ứng dụng”
+-	Xuất báo cáo tài chính dạng CSV: Quản lý quỹ nhóm
+	(Chỉ người sáng lập nhóm mới được xuất báo cáo tài chính và nạp / rút quỹ) 
+	Ví dụ: Số dư ban đầu: 0
+	- Nạp quỹ: Ghi số dư được bổ sung, nguồn bổ sung (hệ thống sẽ lưu ngày bổ sung và không thể chỉnh sửa / xóa ngày bổ sung)
+	- Rút quỹ: Ghi số dư bị rút, lý do rút (hệ thống sẽ lưu ngày rút và không thể chỉnh sửa / xóa ngày rút)
+	Báo cáo tài chính phải công khai cho toàn bộ thành viên team. Admin không có quyền chỉnh sửa / xóa số dư, ngày nạp quỹ, ngày rút quỹ.
+	Khi xuất báo cáo tài chính, thông báo “Báo cáo tài chính đã được xuất” sẽ được tự động đăng lên phần hiển thị thông báo / bài đăng của team
+2.2.3. Quản lý team mình tham gia
+Toàn bộ chức năng của “2.1.1. Quản lý toàn bộ team có trên ứng dụng”
+3.	Chức năng của User
+3.1. Quản lý tài khoản cá nhân
+-	CRUD tên đăng nhập của mình
+-	Reset lại password cho mình (User không có quyền xem mật khẩu hiện tại, mật khẩu của user phải được mã hóa)
+3.2. Quản lý team do mình thành lập
+-	Mặc định mình là role Admin Team (không giống như Admin hệ thống, Admin Team chỉ có toàn quyền trong team do mình tạo ra, còn Admin hệ thống có toàn quyền đối với hệ thống)
+-	CRUD thành viên trong team (xem thông tin cá nhân của thành viên, thêm / xóa thành viên)
+-	Sửa role thành viên trong team (sửa member thành role Coach hoặc Member)
+-	CRUD danh sách môn tập
+-	Quản lý buổi tập (CRUD dạng lịch)
+-	CRUD avatar team
+-	CRUD tên team
+-	Tìm kiếm thành viên trong team (Lọc theo role, môn tập, buổi tập)
+-	Tìm kiếm môn tập (Lọc theo thành viên tham gia, buổi tập)
+-	Quản lý điểm danh (Danh sách điểm danh theo ngày) (Chỉ role Admin Team và Coach mới được thực hiện điểm danh)
+-	CRUD phần hiển thị thông báo / bài viết trong team
+-	Xuất lịch tập trong tuần / tháng / năm
+-	Xuất báo cáo tài chính dạng CSV: Quản lý quỹ nhóm
+	(Chỉ người sáng lập nhóm mới được xuất báo cáo tài chính và nạp / rút quỹ) 
+	Ví dụ: Số dư ban đầu: 0
+	- Nạp quỹ: Ghi số dư được bổ sung, nguồn bổ sung (hệ thống sẽ lưu ngày bổ sung và không thể chỉnh sửa / xóa ngày bổ sung)
+	- Rút quỹ: Ghi số dư bị rút, lý do rút (hệ thống sẽ lưu ngày rút và không thể chỉnh sửa / xóa ngày rút)
+	Báo cáo tài chính phải công khai cho toàn bộ thành viên team. Admin không có quyền chỉnh sửa / xóa số dư, ngày nạp quỹ, ngày rút quỹ.
+	Khi xuất báo cáo tài chính, thông báo “Báo cáo tài chính đã được xuất” sẽ được tự động đăng lên phần hiển thị thông báo / bài đăng của team
+3.3. Quản lý team do mình tham gia
+-	Mặc định mình là role Member khi mới tham gia vào team
+3.3.1. Nếu mình được phân quyền là Member
+-	Xem thông tin cá nhân thành viên trong team
+-	Xem danh sách môn tập
+-	Xem buổi tập (CRUD dạng lịch)
+-	Xem avatar team
+-	Xem tên team
+-	Tìm kiếm thành viên trong team (Lọc theo role, môn tập, buổi tập)
+-	Tìm kiếm môn tập (Lọc theo thành viên tham gia, buổi tập)
+-	Xem phần hiển thị thông báo / bài viết trong team
+-	Xuất lịch tập trong tuần / tháng / năm
+3.3.2. Nếu mình được phân quyền là Coach
+-	Toàn bộ chức năng của “3.3.1. Nếu mình được phân quyền là Member”
+-	Xem thông tin cá nhân thành viên trong team
+-	Quản lý buổi tập (CRUD dạng lịch)
+-	Xem avatar team
+-	Xem tên team
+-	Tìm kiếm thành viên trong team (Lọc theo role, môn tập, buổi tập)
+-	Tìm kiếm môn tập (Lọc theo thành viên tham gia, buổi tập)
+-	Quản lý điểm danh (Danh sách điểm danh theo ngày)
+-	CRUD phần hiển thị thông báo / bài viết của mình trong team
+-	Xuất lịch tập trong tuần / tháng / năm

@@ -1,0 +1,206 @@
+1. Công nghệ Front-end đề xuất
+Dùng C# Desktop Application – Offline Windows App
+WinForms (.NET Framework) ưu tiên đơn giản
+
+2. Triết lý thiết kế UI tổng thể
+•	Role-based UI: Hiển thị chức năng theo quyền
+•	Desktop-first: Chuột + bàn phím
+•	Offline-friendly: Không phụ thuộc internet
+•	Phân tách rõ module: Team / User / Lịch / Quỹ / Thông báo
+•	Nhất quán layout: Sidebar + Main Content
+•	KHÔNG SỬ DỤNG KÉO THẢ
+•	Tất cả các trang đều có nút “quay lại” để quay lại trang vừa truy cập
+
+3. Layout tổng thể ứng dụng
+3.1 Cấu trúc màn hình chính (Main Window)
++------------------------------------------------+
+|  Top Bar                                      |
+|  - App Name                                   |
+|  - User Avatar + Name + Role                  |
+|  - Logout                                     |
++------------------------------------------------+
+| Sidebar          | Main Content                |
+|------------------|----------------------------|
+| - Dashboard      |                            |
+| - Profile        |                            |
+| - Teams          |  Nội dung module           |
+| - Calendar       |                            |
+| - Notifications  |                            |
+| - Admin Panel*   |                            |
++------------------------------------------------+
+* Admin Panel chỉ hiện nếu role = Admin hệ thống
+3.2 Sidebar Navigation (Left Menu)
+Menu items theo role:
+Chung (Admin + User):
+•	Dashboard
+•	Trang cá nhân
+•	Team của tôi
+•	Lịch tập cá nhân
+Admin hệ thống:
+•	Quản lý User
+•	Quản lý toàn bộ Team
+
+5. Module Authentication (Đăng nhập)
+Màn hình Login:
+Components
+•	TextBox: Username
+•	PasswordBox: Password
+•	Button: Login
+•	Label: Error message
+Yêu cầu UI
+•	Không lưu password
+•	Không hiện password
+•	Thông báo lỗi rõ ràng
+
+6. Module Trang cá nhân (Profile)
+6.1 Layout
+[Avatar]  [Change Avatar]
+
+Họ tên:     [TextBox]
+Ngày sinh:  [DatePicker]
+Email:      [TextBox]
+Username:   [TextBox] (Read-only)
+
+[Save]   [Cancel]   [Change Password]
+6.2 Chức năng
+•	CRUD avatar
+•	CRUD họ tên, ngày sinh, email, username
+•   Change Password (User reset own)
+•	Validate:
+o	Email format
+o	Ngày sinh không vượt hiện tại
+
+6.5 Module Lịch tập cá nhân
+Chức năng:
+•   Quản lý môn tập cá nhân (CRUD dạng lịch)
+•   Quản lý lịch tập cá nhân (CRUD dạng lịch)
+UI:
+•   Tương tự Module Calender nhưng áp dụng cho cá nhân.
+
+7. Module Team – Thiết kế lõi của ứng dụng
+7.1 Màn hình danh sách Team
+[Team tôi tạo]  [Team tôi tham gia]
+------------------------------------------------
+---------------------------------
+| | Avatar | 		|
+| | Team Name 1 |		|
+| | Role | 			|
+| | Members | 		|
+| | Actions |		|
+---------------------------------
+---------------------------------
+| | Avatar | 		|
+| | Team Name 2 |		|
+| | Role | 			|
+| | Members | 		|
+| | Actions |		|
+---------------------------------
+Actions:
+•	View
+•	Manage (theo role)
+•	Leave team (nếu không phải founder)
+
+8. Module Chi tiết Team (Team Detail)
+8.1 Layout dạng Tab
+[Avatar][Team Name][Created Date] (Admin System can edit Date)
+
+Tabs:
+- Thành viên
+- Môn tập
+- Buổi tập
+- Điểm danh
+- Thông báo
+- Quỹ nhóm*
+* Tab Quỹ nhóm chỉ hiện với Founder
+
+9. Tab Thành viên
+UI
+[Search box] [Filter by Role] [Filter by Subject] [Filter by Session]
+
+DataGrid:
+| Avatar | Name | Role | Email | Actions |
+Actions theo quyền
+•	View Profile (tất cả)
+•	Add / Remove (Admin Team / Admin hệ thống)
+•	Change role (Admin Team)
+
+10. Tab Môn tập
+[Search box] [Filter by Member] [Filter by Session]
+[List môn tập]
+- Name
+- Người tham gia
+- Buổi tập liên quan
+
+[Add] [Edit] [Delete]  (theo role)
+
+11. Tab Buổi tập (Calendar – rất quan trọng)
+11.1 UI
+•	Calendar View:
+o	Day / Week / Month
+•	Click 1 ngày → hiện danh sách buổi tập
+•   Button: [Export Schedule] (Week/Month/Year)
+11.2 Form buổi tập 
+•	Tên buổi tập
+•	Môn tập
+•	Thời gian bắt đầu – kết thúc
+•	Ghi chú
+
+12. Tab Điểm danh
+UI
+[Date Picker]
+
+Danh sách thành viên:
+[✔] Nguyễn Văn A
+[✘] Trần Văn B
+
+[Save Attendance]
+Quyền:
+•	Coach
+•	Admin Team
+•	Admin hệ thống
+
+13. Tab Thông báo / Bài viết
+[New Post]  (theo role)
+
+-------------------------------------------------
+| Avatar | Name | Date                          |
+| Content                                   |
+-------------------------------------------------
+•	CRUD bài viết
+•	Post hệ thống (auto khi xuất báo cáo quỹ)
+
+14. Tab Quỹ nhóm (Founder only)
+14.1 Tổng quan
+Số dư hiện tại: XXXXX VNĐ
+14.2 Nạp / Rút
+[Nạp quỹ]
+- Số tiền
+- Nguồn
+
+[Rút quỹ]
+- Số tiền
+- Lý do
+•	Ngày auto
+•	Không sửa / xóa
+14.3 Xuất CSV
+•	Button: Export CSV
+•	Popup xác nhận
+•	Auto đăng thông báo
+
+15. Module Admin hệ thống
+15.1 Quản lý User
+DataGrid:
+| Avatar | Name | Username | Email | Actions |
+Actions:
+•	View profile
+•	Reset password (popup xác nhận)
+
+16. Chuẩn UI Component (để agent code đúng)
+•	DataGrid cho danh sách
+•	DatePicker cho ngày
+•	CalendarControl cho lịch
+•	Modal Dialog cho Add/Edit
+•	MessageBox xác nhận xóa
+•	Avatar hình tròn
+•	Disable button nếu không đủ quyền
+

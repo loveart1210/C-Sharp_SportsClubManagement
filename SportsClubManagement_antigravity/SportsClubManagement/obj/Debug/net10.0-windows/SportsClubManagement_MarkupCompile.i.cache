@@ -1,0 +1,20 @@
+﻿SportsClubManagement
+1.0.0.0
+
+winexe
+C#
+.cs
+E:\Personal\Group Assignments\Lap_trinh_Windows\SportsClubManagement\SportsClubManagement\obj\Debug\net10.0-windows\
+SportsClubManagement
+none
+false
+TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
+E:\Personal\Group Assignments\Lap_trinh_Windows\SportsClubManagement\SportsClubManagement\App.xaml
+111831008666
+
+32-1591657575
+2061245606974
+MainWindow.xaml;Views\DashboardView.xaml;Views\LoginView.xaml;Views\ProfileView.xaml;Views\TeamDetailView.xaml;Views\TeamFundsView.xaml;Views\TeamMembersView.xaml;Views\TeamSessionsView.xaml;Views\TeamSubjectsView.xaml;Views\TeamsView.xaml;Views\UserManagementView.xaml;
+
+True
+

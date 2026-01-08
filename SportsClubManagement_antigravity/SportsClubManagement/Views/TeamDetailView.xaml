@@ -1,0 +1,142 @@
+<UserControl x:Class="SportsClubManagement.Views.TeamDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="900">
+    <UserControl.DataContext>
+        <vm:TeamDetailViewModel />
+    </UserControl.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <Image Source="{Binding Team.AvatarPath}" Width="60" Height="60" Stretch="UniformToFill" Grid.Column="0" Margin="0,0,15,0"/>
+            
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Team.Name}" FontSize="24" FontWeight="Bold" Foreground="#1976D2"/>
+                <TextBlock Text="{Binding Team.Description}" Foreground="#666" FontSize="12"/>
+            </StackPanel>
+            
+            <Button Grid.Column="2" Content="← Quay lại" Command="{Binding BackCommand}" 
+                    Padding="12,8" Cursor="Hand" Foreground="#666"/>
+        </Grid>
+
+        <!-- Tabs -->
+        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}">
+            <!-- Tab 1: Members -->
+            <TabItem Header="👥 Thành viên">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Danh sách thành viên" FontSize="14" FontWeight="Bold" Margin="15,15,15,10"/>
+                    
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Members}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="15">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tên" Binding="{Binding UserId}" Width="100"/>
+                            <DataGridTextColumn Header="Vai trò" Binding="{Binding Role}" Width="100"/>
+                            <DataGridTextColumn Header="Ngày tham gia" Binding="{Binding JoinDate}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 2: Subjects -->
+            <TabItem Header="📚 Môn tập">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Danh sách môn tập" FontSize="14" FontWeight="Bold" Margin="15,15,15,10"/>
+                    
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Subjects}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="15">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tên môn" Binding="{Binding Name}" Width="150"/>
+                            <DataGridTextColumn Header="Mô tả" Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="Số người" Binding="{Binding ParticipantCount}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 3: Sessions -->
+            <TabItem Header="🏋️ Buổi tập">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Danh sách buổi tập" FontSize="14" FontWeight="Bold" Margin="15,15,15,10"/>
+                    
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Sessions}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="15">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tên buổi" Binding="{Binding Name}" Width="150"/>
+                            <DataGridTextColumn Header="Bắt đầu" Binding="{Binding StartTime}" Width="150"/>
+                            <DataGridTextColumn Header="Kết thúc" Binding="{Binding EndTime}" Width="150"/>
+                            <DataGridTextColumn Header="Ghi chú" Binding="{Binding Note}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 4: Attendance -->
+            <TabItem Header="✅ Điểm danh">
+                <Grid>
+                    <TextBlock Text="Tab Điểm danh sẽ được cập nhật" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 5: Notifications -->
+            <TabItem Header="🔔 Thông báo">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Thông báo &amp; Bài viết" FontSize="14" FontWeight="Bold" Margin="15,15,15,10"/>
+                    
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Notifications}" Margin="15">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding Content}" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                        <TextBlock Text="{Binding CreatedDate}" FontSize="11" Foreground="#999"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 6: Funds -->
+            <TabItem Header="💰 Quỹ nhóm">
+                <Grid>
+                    <TextBlock Text="Tab Quỹ nhóm sẽ được cập nhật" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

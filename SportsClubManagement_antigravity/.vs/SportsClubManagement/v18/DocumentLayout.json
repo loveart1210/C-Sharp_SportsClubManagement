@@ -1,0 +1,53 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\Personal\\Group Assignments\\Lap_trinh_Windows\\SportsClubManagement\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4893F4D8-88D2-4A4C-BA27-8AB8EFB9A969}|SportsClubManagement\\SportsClubManagement.csproj|e:\\personal\\group assignments\\lap_trinh_windows\\sportsclubmanagement\\sportsclubmanagement\\views\\profileview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4893F4D8-88D2-4A4C-BA27-8AB8EFB9A969}|SportsClubManagement\\SportsClubManagement.csproj|solutionrelative:sportsclubmanagement\\views\\profileview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4893F4D8-88D2-4A4C-BA27-8AB8EFB9A969}|SportsClubManagement\\SportsClubManagement.csproj|e:\\personal\\group assignments\\lap_trinh_windows\\sportsclubmanagement\\sportsclubmanagement\\views\\profileview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{4893F4D8-88D2-4A4C-BA27-8AB8EFB9A969}|SportsClubManagement\\SportsClubManagement.csproj|solutionrelative:sportsclubmanagement\\views\\profileview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ProfileView.xaml.cs",
+              "DocumentMoniker": "E:\\Personal\\Group Assignments\\Lap_trinh_Windows\\SportsClubManagement\\SportsClubManagement\\Views\\ProfileView.xaml.cs",
+              "RelativeDocumentMoniker": "SportsClubManagement\\Views\\ProfileView.xaml.cs",
+              "ToolTip": "E:\\Personal\\Group Assignments\\Lap_trinh_Windows\\SportsClubManagement\\SportsClubManagement\\Views\\ProfileView.xaml.cs*",
+              "RelativeToolTip": "SportsClubManagement\\Views\\ProfileView.xaml.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAArwA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-05T17:11:33.073Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ProfileView.xaml",
+              "DocumentMoniker": "E:\\Personal\\Group Assignments\\Lap_trinh_Windows\\SportsClubManagement\\SportsClubManagement\\Views\\ProfileView.xaml",
+              "RelativeDocumentMoniker": "SportsClubManagement\\Views\\ProfileView.xaml",
+              "ToolTip": "E:\\Personal\\Group Assignments\\Lap_trinh_Windows\\SportsClubManagement\\SportsClubManagement\\Views\\ProfileView.xaml*",
+              "RelativeToolTip": "SportsClubManagement\\Views\\ProfileView.xaml*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-01-05T17:07:42.672Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+<UserControl x:Class="SportsClubManagement.Views.ProfileView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="900">
+    <UserControl.DataContext>
+        <vm:ProfileViewModel />
+    </UserControl.DataContext>
+
+    <Grid>
+        <StackPanel Width="500" HorizontalAlignment="Left">
+            <!-- Title -->
+            <TextBlock Text="Thông tin cá nhân" FontSize="24" FontWeight="Bold" 
+                       Foreground="#1976D2" Margin="0,0,0,30"/>
+
+            <!-- Avatar Section -->
+            <Grid Margin="0,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Image Source="{Binding AvatarPath}" Width="100" Height="100" 
+                       Grid.Column="0" Stretch="UniformToFill" Margin="0,0,20,0"/>
+                
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <Button Content="Thay đổi Avatar" Padding="10,8" Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Full Name -->
+            <TextBlock Text="Họ tên" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,8"/>
+            <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" Padding="10" 
+                     Margin="0,0,0,15" Background="White" BorderBrush="#CCC" BorderThickness="1"/>
+
+            <!-- Birth Date -->
+            <TextBlock Text="Ngày sinh" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,8"/>
+            <DatePicker SelectedDate="{Binding BirthDate, UpdateSourceTrigger=PropertyChanged}" 
+                        Padding="10" Margin="0,0,0,15" Background="White" BorderBrush="#CCC" BorderThickness="1"/>
+
+            <!-- Email -->
+            <TextBlock Text="Email" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,8"/>
+            <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Padding="10" 
+                     Margin="0,0,0,15" Background="White" BorderBrush="#CCC" BorderThickness="1"/>
+
+            <!-- Username -->
+            <TextBlock Text="Tên đăng nhập" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,8"/>
+            <TextBox Text="{Binding Username}" IsReadOnly="True" Padding="10" 
+                     Margin="0,0,0,15" Background="#F5F5F5" BorderBrush="#CCC" BorderThickness="1"/>
+
+            <!-- Message -->
+            <TextBlock Text="{Binding Message}" Foreground="#4CAF50" Margin="0,0,0,15" FontSize="12"/>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal">
+                <Button Content="💾 Lưu thay đổi" Command="{Binding SaveCommand}" 
+                        Padding="15,10" Background="#4CAF50" Foreground="White" 
+                        FontWeight="SemiBold" Margin="0,0,10,0" Cursor="Hand"/>
+                <Button Content="❌ Hủy" Command="{Binding CancelCommand}" 
+                        Padding="15,10" Background="#999" Foreground="White" 
+                        FontWeight="SemiBold" Cursor="Hand"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

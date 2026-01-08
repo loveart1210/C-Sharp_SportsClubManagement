@@ -1,0 +1,98 @@
+{
+  "Users": [
+    {
+      "Id": "c1b39c9b-af8b-4502-ab03-4337a66628c6",
+      "Username": "admin",
+      "Password": "admin123",
+      "FullName": "Admin System",
+      "Email": "admin@sports.club",
+      "Role": "Admin",
+      "AvatarPath": null,
+      "BirthDate": "1990-01-01T00:00:00",
+      "CreatedDate": "2026-01-06T07:26:49.8930239+07:00"
+    },
+    {
+      "Id": "b1cc33c7-1842-4d7f-a2a4-477df3248a09",
+      "Username": "user1",
+      "Password": "user123",
+      "FullName": "Nguy\u1EC5n V\u0103n A",
+      "Email": "user1@sports.club",
+      "Role": "User",
+      "AvatarPath": null,
+      "BirthDate": "2000-05-15T00:00:00",
+      "CreatedDate": "2026-01-06T07:26:49.8931415+07:00"
+    },
+    {
+      "Id": "9b6ec693-938d-4db1-bf61-f87bb3e28dd5",
+      "Username": "user2",
+      "Password": "user123",
+      "FullName": "Tr\u1EA7n V\u0103n B",
+      "Email": "user2@sports.club",
+      "Role": "User",
+      "AvatarPath": null,
+      "BirthDate": "2001-03-20T00:00:00",
+      "CreatedDate": "2026-01-06T07:26:49.8931432+07:00"
+    }
+  ],
+  "Teams": [
+    {
+      "Id": "9f12539b-ce40-4a14-8792-fe8216add1e3",
+      "Name": "B\u00F3ng Chuy\u1EC1n A",
+      "Description": "\u0110\u1ED9i b\u00F3ng chuy\u1EC1n ch\u00EDnh",
+      "AvatarPath": null,
+      "CreatedDate": "2026-01-06T07:26:49.8931901+07:00",
+      "Balance": 5000000
+    }
+  ],
+  "TeamMembers": [
+    {
+      "Id": "798241e5-63ec-40a9-9d67-c7f87b7e06f9",
+      "UserId": "b1cc33c7-1842-4d7f-a2a4-477df3248a09",
+      "TeamId": "9f12539b-ce40-4a14-8792-fe8216add1e3",
+      "Role": "Founder",
+      "JoinDate": "2026-01-06T07:26:49.8933769+07:00"
+    },
+    {
+      "Id": "c3395bf2-4742-46a0-954f-9afc7cf1359d",
+      "UserId": "9b6ec693-938d-4db1-bf61-f87bb3e28dd5",
+      "TeamId": "9f12539b-ce40-4a14-8792-fe8216add1e3",
+      "Role": "Coach",
+      "JoinDate": "2025-12-27T07:26:49.8933903+07:00"
+    }
+  ],
+  "Subjects": [
+    {
+      "Id": "796c32f5-b69c-475c-9d96-6bbc1a583de0",
+      "TeamId": "9f12539b-ce40-4a14-8792-fe8216add1e3",
+      "Name": "K\u1EF9 thu\u1EADt c\u01A1 b\u1EA3n",
+      "Description": "H\u1ECDc c\u00E1c k\u1EF9 thu\u1EADt chuy\u1EC1n, ph\u00E1t b\u00F3ng",
+      "ParticipantCount": 2,
+      "CreatedDate": "2026-01-06T07:26:49.8934196+07:00"
+    }
+  ],
+  "Sessions": [
+    {
+      "Id": "f4782841-ef77-480a-8db5-af6354f9f81d",
+      "TeamId": "9f12539b-ce40-4a14-8792-fe8216add1e3",
+      "SubjectId": "796c32f5-b69c-475c-9d96-6bbc1a583de0",
+      "Name": "Bu\u1ED5i t\u1EADp chi\u1EC1u",
+      "StartTime": "2026-01-08T15:00:00",
+      "EndTime": "2026-01-08T17:00:00",
+      "Note": "Mang theo n\u01B0\u1EDBc u\u1ED1ng",
+      "CreatedDate": "2026-01-06T07:26:49.8934987+07:00"
+    }
+  ],
+  "Attendances": [],
+  "Transactions": [],
+  "Notifications": [
+    {
+      "Id": "4d9556fd-ca76-4a38-90aa-b6c7553241c1",
+      "TeamId": "9f12539b-ce40-4a14-8792-fe8216add1e3",
+      "ByUserId": "b1cc33c7-1842-4d7f-a2a4-477df3248a09",
+      "Content": "Team B\u00F3ng Chuy\u1EC1n A v\u1EEBa \u0111\u01B0\u1EE3c t\u1EA1o",
+      "CreatedDate": "2026-01-06T07:26:49.893607+07:00",
+      "IsSystemNotification": true,
+      "Title": "Th\u00F4ng b\u00E1o t\u1EA1o team"
+    }
+  ]
+}
