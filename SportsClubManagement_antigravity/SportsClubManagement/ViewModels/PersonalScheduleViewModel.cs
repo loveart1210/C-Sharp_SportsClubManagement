@@ -15,6 +15,7 @@ namespace SportsClubManagement.ViewModels
         private ObservableCollection<Session> _sessions;
         private DateTime _selectedDate;
         private int _selectedTabIndex;
+        private bool _hasExplicitlySelectedDate = false;
         
         // Subject creation/editing
         private string _newSubjectName = string.Empty;
@@ -29,7 +30,7 @@ namespace SportsClubManagement.ViewModels
         private string _newSessionNote = string.Empty;
         
         // Filtering
-        private string _filterStatus = "Tất cả";
+        private string _filterStatus = "Chưa bắt đầu";
         private string _filterDay = "Tất cả";
         private string _filterMonth = "Tất cả";
         private string _filterYear = "Tất cả";
@@ -47,6 +48,7 @@ namespace SportsClubManagement.ViewModels
         private ObservableCollection<string> _endTimeOptions;
 
         private ObservableCollection<SessionViewItem> _sessionViewItems;
+        private System.Windows.Threading.DispatcherTimer _refreshTimer;
 
 
         public ObservableCollection<Subject> Subjects
@@ -68,10 +70,16 @@ namespace SportsClubManagement.ViewModels
             {
                 if (SetProperty(ref _selectedDate, value))
                 {
+                    _hasExplicitlySelectedDate = true;
+                    OnPropertyChanged(nameof(ScheduleHeaderText));
                     LoadSessions();
                 }
             }
         }
+
+        public string ScheduleHeaderText => _hasExplicitlySelectedDate 
+            ? $"Danh sách buổi tập - {SelectedDate:dd/MM/yyyy}" 
+            : "Danh sách buổi tập";
 
         public int SelectedTabIndex
         {
@@ -130,7 +138,7 @@ namespace SportsClubManagement.ViewModels
         public string FilterStartTime { get => _filterStartTime; set { if (SetProperty(ref _filterStartTime, value)) LoadSessions(); } }
         public string FilterEndTime { get => _filterEndTime; set { if (SetProperty(ref _filterEndTime, value)) LoadSessions(); } }
 
-        public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string> { "Tất cả", "Chưa bắt đầu", "Hoàn thành", "Quá hạn" };
+        public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string> { "Tất cả", "Chưa bắt đầu", "Đang diễn ra", "Hoàn thành", "Quá hạn" };
         public ObservableCollection<string> DayOptions { get => _dayOptions; set => SetProperty(ref _dayOptions, value); }
         public ObservableCollection<string> MonthOptions { get => _monthOptions; set => SetProperty(ref _monthOptions, value); }
         public ObservableCollection<string> YearOptions { get => _yearOptions; set => SetProperty(ref _yearOptions, value); }
@@ -164,6 +172,12 @@ namespace SportsClubManagement.ViewModels
                 LoadSessions();
             }
 
+            // Real-time status refresh timer (every 30 seconds)
+            _refreshTimer = new System.Windows.Threading.DispatcherTimer();
+            _refreshTimer.Interval = TimeSpan.FromSeconds(30);
+            _refreshTimer.Tick += (s, e) => LoadSessions();
+            _refreshTimer.Start();
+
             AddSubjectCommand = new RelayCommand(AddSubject, CanAddSubject);
             EditSubjectCommand = new RelayCommand(EditSubject);
             RemoveSubjectCommand = new RelayCommand(RemoveSubject);
@@ -192,7 +206,6 @@ namespace SportsClubManagement.ViewModels
         {
             DayOptions = new ObservableCollection<string>(new[] { "Tất cả" }.Concat(Enumerable.Range(1, 31).Select(i => i.ToString())).ToList());
             MonthOptions = new ObservableCollection<string>(new[] { "Tất cả" }.Concat(Enumerable.Range(1, 12).Select(i => i.ToString())).ToList());
-            YearOptions = new ObservableCollection<string>(new[] { "Tất cả", "2024", "2025", "2026" });
             
             UpdateDynamicFilterOptions();
         }
@@ -204,6 +217,10 @@ namespace SportsClubManagement.ViewModels
             SessionNameOptions = new ObservableCollection<string>(new[] { "Tất cả" }.Concat(userSessions.Select(s => s.Name).Distinct()).ToList());
             StartTimeOptions = new ObservableCollection<string>(new[] { "Tất cả" }.Concat(userSessions.Select(s => s.StartTime.ToString("HH:mm")).Distinct().OrderBy(t => t)).ToList());
             EndTimeOptions = new ObservableCollection<string>(new[] { "Tất cả" }.Concat(userSessions.Select(s => s.EndTime.ToString("HH:mm")).Distinct().OrderBy(t => t)).ToList());
+            
+            // Dynamic Years
+            var years = userSessions.Select(s => s.StartTime.Year.ToString()).Distinct().OrderBy(y => y).ToList();
+            YearOptions = new ObservableCollection<string>(new[] { "Tất cả" }.Concat(years).ToList());
         }
 
         private void LoadSessions()
@@ -215,46 +232,33 @@ namespace SportsClubManagement.ViewModels
 
             var filtered = allSessions.AsQueryable();
 
-            // Default view: if all filters are "Tất cả", show upcoming and in SELECTED MONTH
-            bool isFiltering = FilterStatus != "Tất cả" || FilterDay != "Tất cả" || FilterMonth != "Tất cả" || 
-                               FilterYear != "Tất cả" || FilterSessionName != "Tất cả" ||
-                               FilterSubjectName != "Tất cả" || FilterStartTime != "Tất cả" ||
-                               FilterEndTime != "Tất cả";
-
-            if (!isFiltering)
+            // Apply filters
+            if (FilterStatus != "Tất cả")
             {
-                // Show upcoming sessions in the month of SelectedDate
-                filtered = filtered.Where(s => s.StartTime >= now && s.StartTime.Month == SelectedDate.Month && s.StartTime.Year == SelectedDate.Year);
+                if (FilterStatus == "Hoàn thành") filtered = filtered.Where(s => s.IsAttended);
+                else if (FilterStatus == "Quá hạn") filtered = filtered.Where(s => !s.IsAttended && s.EndTime < now);
+                else if (FilterStatus == "Chưa bắt đầu") filtered = filtered.Where(s => !s.IsAttended && s.StartTime > now);
+                else if (FilterStatus == "Đang diễn ra") filtered = filtered.Where(s => !s.IsAttended && s.StartTime <= now && s.EndTime >= now);
             }
-            else
+
+            if (FilterDay != "Tất cả" && int.TryParse(FilterDay, out int d)) filtered = filtered.Where(s => s.StartTime.Day == d);
+            if (FilterMonth != "Tất cả" && int.TryParse(FilterMonth, out int m)) filtered = filtered.Where(s => s.StartTime.Month == m);
+            if (FilterYear != "Tất cả" && int.TryParse(FilterYear, out int y)) filtered = filtered.Where(s => s.StartTime.Year == y);
+            
+            if (FilterSessionName != "Tất cả")
+                filtered = filtered.Where(s => s.Name == FilterSessionName);
+            
+            if (FilterSubjectName != "Tất cả")
             {
-                // Apply filters
-                if (FilterStatus != "Tất cả")
-                {
-                    if (FilterStatus == "Hoàn thành") filtered = filtered.Where(s => s.IsAttended);
-                    else if (FilterStatus == "Quá hạn") filtered = filtered.Where(s => !s.IsAttended && s.EndTime < now);
-                    else if (FilterStatus == "Chưa bắt đầu") filtered = filtered.Where(s => !s.IsAttended && s.StartTime > now);
-                }
-
-                if (FilterDay != "Tất cả" && int.TryParse(FilterDay, out int d)) filtered = filtered.Where(s => s.StartTime.Day == d);
-                if (FilterMonth != "Tất cả" && int.TryParse(FilterMonth, out int m)) filtered = filtered.Where(s => s.StartTime.Month == m);
-                if (FilterYear != "Tất cả" && int.TryParse(FilterYear, out int y)) filtered = filtered.Where(s => s.StartTime.Year == y);
-                
-                if (FilterSessionName != "Tất cả")
-                    filtered = filtered.Where(s => s.Name == FilterSessionName);
-                
-                if (FilterSubjectName != "Tất cả")
-                {
-                    var subjectsDict = DataService.Instance.Subjects.ToDictionary(sub => sub.Id, sub => sub.Name);
-                    filtered = filtered.Where(s => subjectsDict.ContainsKey(s.SubjectId) && subjectsDict[s.SubjectId] == FilterSubjectName);
-                }
-
-                if (FilterStartTime != "Tất cả")
-                    filtered = filtered.Where(s => s.StartTime.ToString("HH:mm") == FilterStartTime);
-
-                if (FilterEndTime != "Tất cả")
-                    filtered = filtered.Where(s => s.EndTime.ToString("HH:mm") == FilterEndTime);
+                var subjectsDict = DataService.Instance.Subjects.ToDictionary(sub => sub.Id, sub => sub.Name);
+                filtered = filtered.Where(s => subjectsDict.ContainsKey(s.SubjectId) && subjectsDict[s.SubjectId] == FilterSubjectName);
             }
+
+            if (FilterStartTime != "Tất cả")
+                filtered = filtered.Where(s => s.StartTime.ToString("HH:mm") == FilterStartTime);
+
+            if (FilterEndTime != "Tất cả")
+                filtered = filtered.Where(s => s.EndTime.ToString("HH:mm") == FilterEndTime);
 
             var result = filtered.OrderBy(s => s.StartTime).ToList();
             var subjects = DataService.Instance.Subjects.ToDictionary(s => s.Id, s => s.Name);
@@ -280,7 +284,7 @@ namespace SportsClubManagement.ViewModels
 
         private void ClearFilters()
         {
-            _filterStatus = "Tất cả";
+            _filterStatus = "Chưa bắt đầu";
             _filterDay = "Tất cả";
             _filterMonth = "Tất cả";
             _filterYear = "Tất cả";
@@ -288,6 +292,9 @@ namespace SportsClubManagement.ViewModels
             _filterSubjectName = "Tất cả";
             _filterStartTime = "Tất cả";
             _filterEndTime = "Tất cả";
+            
+            _hasExplicitlySelectedDate = false;
+            OnPropertyChanged(nameof(ScheduleHeaderText));
             
             OnPropertyChanged(nameof(FilterStatus));
             OnPropertyChanged(nameof(FilterDay));

@@ -169,7 +169,7 @@
 
                     <!-- Sessions List -->
                     <DockPanel Grid.Column="1">
-                        <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedDate, StringFormat='Danh sách buổi tập - {0:dd/MM/yyyy}'}" 
+                        <TextBlock DockPanel.Dock="Top" Text="{Binding ScheduleHeaderText}" 
                                    FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
                         
                         <DataGrid ItemsSource="{Binding SessionViewItems}" AutoGenerateColumns="False" CanUserAddRows="False" 
@@ -186,6 +186,9 @@
                                         <Style TargetType="TextBlock">
                                             <Setter Property="HorizontalAlignment" Value="Center"/>
                                             <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Status}" Value="Đang diễn ra">
+                                                    <Setter Property="Foreground" Value="#FF9800"/>
+                                                </DataTrigger>
                                                 <DataTrigger Binding="{Binding Status}" Value="Hoàn thành">
                                                     <Setter Property="Foreground" Value="#4CAF50"/>
                                                 </DataTrigger>
