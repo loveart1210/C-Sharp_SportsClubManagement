@@ -72,6 +72,17 @@ namespace SportsClubManagement.ViewModels
                 {
                     _hasExplicitlySelectedDate = true;
                     OnPropertyChanged(nameof(ScheduleHeaderText));
+                    // Reset Status to "Tất cả" to show all sessions for that day as requested
+                    _filterStatus = "Tất cả";
+                    OnPropertyChanged(nameof(FilterStatus));
+                    
+                    // Reset overriding Date filters
+                    _filterDay = "Tất cả";
+                    OnPropertyChanged(nameof(FilterDay));
+                    _filterMonth = "Tất cả";
+                    OnPropertyChanged(nameof(FilterMonth));
+                    _filterYear = "Tất cả";
+                    OnPropertyChanged(nameof(FilterYear));
                     LoadSessions();
                 }
             }
@@ -130,9 +141,9 @@ namespace SportsClubManagement.ViewModels
 
         // Filter Properties
         public string FilterStatus { get => _filterStatus; set { if (SetProperty(ref _filterStatus, value)) LoadSessions(); } }
-        public string FilterDay { get => _filterDay; set { if (SetProperty(ref _filterDay, value)) LoadSessions(); } }
-        public string FilterMonth { get => _filterMonth; set { if (SetProperty(ref _filterMonth, value)) LoadSessions(); } }
-        public string FilterYear { get => _filterYear; set { if (SetProperty(ref _filterYear, value)) LoadSessions(); } }
+        public string FilterDay { get => _filterDay; set { if (SetProperty(ref _filterDay, value)) { _hasExplicitlySelectedDate = false; OnPropertyChanged(nameof(ScheduleHeaderText)); LoadSessions(); } } }
+        public string FilterMonth { get => _filterMonth; set { if (SetProperty(ref _filterMonth, value)) { _hasExplicitlySelectedDate = false; OnPropertyChanged(nameof(ScheduleHeaderText)); LoadSessions(); } } }
+        public string FilterYear { get => _filterYear; set { if (SetProperty(ref _filterYear, value)) { _hasExplicitlySelectedDate = false; OnPropertyChanged(nameof(ScheduleHeaderText)); LoadSessions(); } } }
         public string FilterSessionName { get => _filterSessionName; set { if (SetProperty(ref _filterSessionName, value)) LoadSessions(); } }
         public string FilterSubjectName { get => _filterSubjectName; set { if (SetProperty(ref _filterSubjectName, value)) LoadSessions(); } }
         public string FilterStartTime { get => _filterStartTime; set { if (SetProperty(ref _filterStartTime, value)) LoadSessions(); } }
@@ -241,9 +252,16 @@ namespace SportsClubManagement.ViewModels
                 else if (FilterStatus == "Đang diễn ra") filtered = filtered.Where(s => !s.IsAttended && s.StartTime <= now && s.EndTime >= now);
             }
 
-            if (FilterDay != "Tất cả" && int.TryParse(FilterDay, out int d)) filtered = filtered.Where(s => s.StartTime.Day == d);
-            if (FilterMonth != "Tất cả" && int.TryParse(FilterMonth, out int m)) filtered = filtered.Where(s => s.StartTime.Month == m);
-            if (FilterYear != "Tất cả" && int.TryParse(FilterYear, out int y)) filtered = filtered.Where(s => s.StartTime.Year == y);
+            if (_hasExplicitlySelectedDate)
+            {
+                filtered = filtered.Where(s => s.StartTime.Date == SelectedDate.Date);
+            }
+            else
+            {
+                if (FilterDay != "Tất cả" && int.TryParse(FilterDay, out int d)) filtered = filtered.Where(s => s.StartTime.Day == d);
+                if (FilterMonth != "Tất cả" && int.TryParse(FilterMonth, out int m)) filtered = filtered.Where(s => s.StartTime.Month == m);
+                if (FilterYear != "Tất cả" && int.TryParse(FilterYear, out int y)) filtered = filtered.Where(s => s.StartTime.Year == y);
+            }
             
             if (FilterSessionName != "Tất cả")
                 filtered = filtered.Where(s => s.Name == FilterSessionName);
