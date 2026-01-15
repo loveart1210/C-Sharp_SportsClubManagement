@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using SportsClubManagement.Helpers;
 using SportsClubManagement.Services;
+using SportsClubManagement.Views;
 
 namespace SportsClubManagement.ViewModels
 {
@@ -75,7 +76,14 @@ namespace SportsClubManagement.ViewModels
         private void ExecuteLogout(object obj)
         {
             DataService.Instance.CurrentUser = null;
-            Application.Current.Shutdown();
+            
+            // Return to login screen
+            LoginView loginView = new LoginView();
+            loginView.Show();
+            
+            // Close current window
+            Application.Current.MainWindow.Close();
+            Application.Current.MainWindow = loginView;
         }
     }
 }
