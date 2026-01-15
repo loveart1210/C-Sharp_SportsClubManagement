@@ -142,3 +142,5 @@ E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManag
 E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\PersonalScheduleView.g.cs
 E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\PersonalScheduleView.baml
 E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\SportsClubManagement.sourcelink.json
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\RegisterView.g.cs
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\RegisterView.baml

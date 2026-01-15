@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SportsClubManagement.Views"
         xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
         mc:Ignorable="d"
-        Title="Quản lý Câu lạc bộ Thể thao" MaxHeight="420" MaxWidth="450"
+        Title="Quản lý Câu lạc bộ Thể thao" MaxHeight="450" MaxWidth="450"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#F5F5F5">
@@ -52,6 +52,17 @@
                 <!-- Demo Hint -->
                 <TextBlock Text="Dùng thử: admin / admin123 hoặc user1 / user123"
                            Foreground="#999" FontSize="11" TextAlignment="Center" Margin="0,0,0,15"/>
+
+                <!-- Register Link -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Chưa có tài khoản? " Foreground="#666"/>
+                    <TextBlock Text="Đăng ký" Foreground="#1976D2" FontWeight="Bold"
+                               Cursor="Hand" TextDecorations="Underline">
+                        <TextBlock.InputBindings>
+                            <MouseBinding Command="{Binding NavigateToRegisterCommand}" MouseAction="LeftClick"/>
+                        </TextBlock.InputBindings>
+                    </TextBlock>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </ScrollViewer>

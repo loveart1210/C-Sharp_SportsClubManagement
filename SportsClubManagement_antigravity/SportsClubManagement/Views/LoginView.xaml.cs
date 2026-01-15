@@ -27,6 +27,7 @@ namespace SportsClubManagement.Views
 
             // Open MainWindow
             MainWindow main = new MainWindow();
+            Application.Current.MainWindow = main;
             main.Show();
             this.Close();
         }

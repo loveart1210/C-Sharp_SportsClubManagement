@@ -33,9 +33,29 @@ namespace SportsClubManagement.ViewModels
 
         public ICommand LoginCommand { get; }
 
+        public ICommand NavigateToRegisterCommand { get; }
+
         public LoginViewModel()
         {
             LoginCommand = new RelayCommand(ExecuteLogin, CanExecuteLogin);
+            NavigateToRegisterCommand = new RelayCommand(ExecuteNavigateToRegister);
+        }
+
+        private void ExecuteNavigateToRegister(object parameter)
+        {
+            var registerView = new Views.RegisterView();
+            registerView.Show();
+
+            // Close current window (LoginView)
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.DataContext == this)
+                {
+                    window.Close();
+                    break;
+                }
+            }
+            Application.Current.MainWindow = registerView;
         }
 
         private bool CanExecuteLogin(object parameter)

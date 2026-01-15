@@ -6,9 +6,7 @@
              xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
-    <UserControl.DataContext>
-        <vm:TeamDetailViewModel />
-    </UserControl.DataContext>
+
 
     <Grid>
         <Grid.RowDefinitions>

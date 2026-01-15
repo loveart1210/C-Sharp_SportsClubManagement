@@ -56,7 +56,18 @@ namespace SportsClubManagement.ViewModels
             }
 
             NavigateToDashboardCommand = new RelayCommand(o => CurrentView = new DashboardViewModel());
-            NavigateToTeamsCommand = new RelayCommand(o => CurrentView = new TeamsViewModel());
+            NavigateToDashboardCommand = new RelayCommand(o => CurrentView = new DashboardViewModel());
+            NavigateToTeamsCommand = new RelayCommand(o => 
+            {
+                var teamsVM = new TeamsViewModel();
+                teamsVM.OnTeamSelected += (s, team) =>
+                {
+                    var detailVM = new TeamDetailViewModel(team);
+                    detailVM.OnBack += (s2, e2) => CurrentView = new TeamsViewModel(); // Simple reload on back
+                    CurrentView = detailVM;
+                };
+                CurrentView = teamsVM;
+            });
             NavigateToPersonalScheduleCommand = new RelayCommand(o => {
                 var vm = new PersonalScheduleViewModel();
                 if (o != null && int.TryParse(o.ToString(), out int index))
@@ -81,8 +92,17 @@ namespace SportsClubManagement.ViewModels
             LoginView loginView = new LoginView();
             loginView.Show();
             
-            // Close current window
-            Application.Current.MainWindow.Close();
+            // Close current window safely
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.DataContext == this)
+                {
+                    window.Close();
+                    break;
+                }
+            }
+
+            // Set the new LoginView as the main window
             Application.Current.MainWindow = loginView;
         }
     }

@@ -5,10 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="900">
-    <UserControl.DataContext>
-        <vm:TeamsViewModel />
-    </UserControl.DataContext>
+             d:DesignHeight="600" d:DesignWidth="900"
+             x:Name="TeamsViewRoot">
+
 
     <Grid>
         <Grid.RowDefinitions>
@@ -76,10 +75,74 @@
             </StackPanel>
         </Border>
 
-        <!-- Teams List -->
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Teams}" AutoGenerateColumns="False" 
-                  SelectedItem="{Binding SelectedTeam}" CanUserAddRows="False"
-                  Background="White" BorderBrush="#E0E0E0" BorderThickness="1">
+        <!-- Main Content Grid -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Search & Join -->
+                <RowDefinition Height="*"/>    <!-- List -->
+            </Grid.RowDefinitions>
+
+            <!-- Search and Join -->
+            <Grid Grid.Row="0" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Search Box -->
+                <Border Grid.Column="0" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4" Margin="0,0,10,0">
+                    <Grid>
+                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                 Padding="30,8,8,8" BorderThickness="0" Background="Transparent"
+                                 VerticalContentAlignment="Center" x:Name="SearchBox"/>
+                        <TextBlock Text="🔍 Tìm kiếm team của bạn..." Foreground="Gray" Padding="30,8,8,8" 
+                                   IsHitTestVisible="False" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Border>
+
+                <!-- Join Team Box -->
+                <Border Grid.Column="1" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid Width="200">
+                            <TextBox Text="{Binding JoinTeamCode, UpdateSourceTrigger=PropertyChanged}" 
+                                     Padding="8" BorderThickness="0" Background="Transparent"
+                                     VerticalContentAlignment="Center" x:Name="JoinBox"/>
+                            <TextBlock Text="# Nhập mã Team để tham gia" Foreground="Gray" Padding="8" 
+                                       IsHitTestVisible="False" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=JoinBox, Path=Text}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <Button Content="Tham gia" Command="{Binding JoinTeamCommand}"
+                                Background="#FF9800" Foreground="White" FontWeight="Bold"
+                                Padding="15,8" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Teams List -->
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Teams}" AutoGenerateColumns="False" 
+                      SelectedItem="{Binding SelectedTeam}" CanUserAddRows="False"
+                      Background="White" BorderBrush="#E0E0E0" BorderThickness="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Tên Team" Binding="{Binding Team.Name}" Width="200"/>
                 <DataGridTextColumn Header="Mô tả" Binding="{Binding Team.Description}" Width="*"/>
@@ -89,12 +152,14 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Xem chi tiết" Padding="8,5" 
-                                    Background="#2196F3" Foreground="White" Cursor="Hand"
-                                    Command="{Binding DataContext.ViewTeamCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                    Background="#4CAF50" Foreground="White" Cursor="Hand"
+                                    Command="{Binding DataContext.ViewTeamCommand, ElementName=TeamsViewRoot}"
+                                    CommandParameter="{Binding}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        </Grid>
     </Grid>
 </UserControl>

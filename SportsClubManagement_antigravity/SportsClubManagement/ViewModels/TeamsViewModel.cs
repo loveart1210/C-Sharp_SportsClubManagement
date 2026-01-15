@@ -53,11 +53,64 @@ namespace SportsClubManagement.ViewModels
 
         public ICommand ViewTeamCommand { get; }
         public ICommand CreateTeamCommand { get; }
+        public ICommand JoinTeamCommand { get; }
+
+        private string _joinTeamCode;
+        public string JoinTeamCode
+        {
+            get => _joinTeamCode;
+            set => SetProperty(ref _joinTeamCode, value);
+        }
 
         public TeamsViewModel()
         {
             ViewTeamCommand = new RelayCommand(ViewTeam, CanViewTeam);
             CreateTeamCommand = new RelayCommand(CreateTeam, CanCreateTeam);
+            JoinTeamCommand = new RelayCommand(JoinTeam, CanJoinTeam);
+            LoadTeamData();
+        }
+
+        private bool CanJoinTeam(object parameter)
+        {
+            return !string.IsNullOrWhiteSpace(JoinTeamCode);
+        }
+
+        private void JoinTeam(object parameter)
+        {
+            var currentUser = DataService.Instance.CurrentUser;
+            if (currentUser == null) return;
+
+            // Check if team exists
+            var team = DataService.Instance.Teams.FirstOrDefault(t => t.Id == JoinTeamCode || t.Id.StartsWith(JoinTeamCode));
+            
+            if (team == null)
+            {
+                System.Windows.MessageBox.Show("Không tìm thấy Team với mã này.", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                return;
+            }
+
+            // Check if already a member
+            if (DataService.Instance.TeamMembers.Any(tm => tm.TeamId == team.Id && tm.UserId == currentUser.Id))
+            {
+                System.Windows.MessageBox.Show("Bạn đã tham gia Team này rồi.", "Thông báo", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                return;
+            }
+
+            // Join team
+            var newMember = new TeamMember
+            {
+                TeamId = team.Id,
+                UserId = currentUser.Id,
+                Role = "Member",
+                JoinDate = DateTime.Now
+            };
+
+            DataService.Instance.TeamMembers.Add(newMember);
+            DataService.Instance.Save();
+
+            System.Windows.MessageBox.Show($"Bạn đã tham gia Team '{team.Name}' thành công!", "Thành công", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            
+            JoinTeamCode = string.Empty;
             LoadTeamData();
         }
 
@@ -111,15 +164,16 @@ namespace SportsClubManagement.ViewModels
 
         private bool CanViewTeam(object parameter)
         {
-            return SelectedTeam != null;
+            return parameter is TeamDisplayModel || SelectedTeam != null;
         }
 
         private void ViewTeam(object parameter)
         {
-            if (SelectedTeam?.Team != null)
+            var teamModel = parameter as TeamDisplayModel ?? SelectedTeam;
+            if (teamModel?.Team != null)
             {
                 // This would normally navigate; for now we can raise an event
-                OnTeamSelected?.Invoke(this, SelectedTeam.Team);
+                OnTeamSelected?.Invoke(this, teamModel.Team);
             }
         }
 
