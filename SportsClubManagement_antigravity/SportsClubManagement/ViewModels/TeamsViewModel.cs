@@ -10,10 +10,10 @@ namespace SportsClubManagement.ViewModels
 {
     public class TeamsViewModel : ViewModelBase
     {
-        private ObservableCollection<TeamDisplayModel> _teams;
-        private ObservableCollection<TeamDisplayModel> _allTeams;
-        private TeamDisplayModel _selectedTeam;
-        private string _searchText;
+        private ObservableCollection<TeamDisplayModel> _teams = new ObservableCollection<TeamDisplayModel>();
+        private ObservableCollection<TeamDisplayModel> _allTeams = new ObservableCollection<TeamDisplayModel>();
+        private TeamDisplayModel? _selectedTeam;
+        private string _searchText = string.Empty;
         private string _newTeamName = string.Empty;
         private string _newTeamDescription = string.Empty;
 
@@ -23,7 +23,7 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _teams, value);
         }
 
-        public TeamDisplayModel SelectedTeam
+        public TeamDisplayModel? SelectedTeam
         {
             get => _selectedTeam;
             set => SetProperty(ref _selectedTeam, value);
@@ -55,7 +55,7 @@ namespace SportsClubManagement.ViewModels
         public ICommand CreateTeamCommand { get; }
         public ICommand JoinTeamCommand { get; }
 
-        private string _joinTeamCode;
+        private string _joinTeamCode = string.Empty;
         public string JoinTeamCode
         {
             get => _joinTeamCode;
@@ -70,12 +70,12 @@ namespace SportsClubManagement.ViewModels
             LoadTeamData();
         }
 
-        private bool CanJoinTeam(object parameter)
+        private bool CanJoinTeam(object? parameter)
         {
             return !string.IsNullOrWhiteSpace(JoinTeamCode);
         }
 
-        private void JoinTeam(object parameter)
+        private void JoinTeam(object? parameter)
         {
             var currentUser = DataService.Instance.CurrentUser;
             if (currentUser == null) return;
@@ -162,12 +162,12 @@ namespace SportsClubManagement.ViewModels
             Teams = new ObservableCollection<TeamDisplayModel>(filtered.ToList());
         }
 
-        private bool CanViewTeam(object parameter)
+        private bool CanViewTeam(object? parameter)
         {
             return parameter is TeamDisplayModel || SelectedTeam != null;
         }
 
-        private void ViewTeam(object parameter)
+        private void ViewTeam(object? parameter)
         {
             var teamModel = parameter as TeamDisplayModel ?? SelectedTeam;
             if (teamModel?.Team != null)
@@ -177,12 +177,12 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private bool CanCreateTeam(object parameter)
+        private bool CanCreateTeam(object? parameter)
         {
             return !string.IsNullOrWhiteSpace(NewTeamName);
         }
 
-        private void CreateTeam(object parameter)
+        private void CreateTeam(object? parameter)
         {
             var currentUser = DataService.Instance.CurrentUser;
             if (currentUser == null) return;
@@ -221,13 +221,13 @@ namespace SportsClubManagement.ViewModels
                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
 
-        public event EventHandler<Team> OnTeamSelected;
+        public event EventHandler<Team>? OnTeamSelected;
     }
 
     public class TeamDisplayModel
     {
-        public Team Team { get; set; }
-        public string MemberRole { get; set; }
+        public Team Team { get; set; } = new Team();
+        public string MemberRole { get; set; } = "Member";
         public int MemberCount { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace SportsClubManagement.Converters
 {
     public class IntToVisibilityConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is int intValue && parameter is string paramString && int.TryParse(paramString, out int targetValue))
             {
@@ -16,7 +16,7 @@ namespace SportsClubManagement.Converters
             return Visibility.Collapsed;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

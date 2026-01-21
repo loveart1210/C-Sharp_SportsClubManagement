@@ -12,16 +12,16 @@ namespace SportsClubManagement.ViewModels
 {
     public class ProfileViewModel : ViewModelBase
     {
-        private User _currentUser;
-        private string _username;
-        private string _fullName;
-        private string _email;
-        private string _avatarPath;
+        private User? _currentUser;
+        private string _username = string.Empty;
+        private string _fullName = string.Empty;
+        private string _email = string.Empty;
+        private string _avatarPath = string.Empty;
         private DateTime _birthDate;
-        private string _message;
-        private string _currentPassword;
-        private string _newPassword;
-        private string _confirmPassword;
+        private string _message = string.Empty;
+        private string _currentPassword = string.Empty;
+        private string _newPassword = string.Empty;
+        private string _confirmPassword = string.Empty;
         private bool _isChangingPassword;
 
         public string Username
@@ -115,7 +115,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void SaveProfile(object obj)
+        private void SaveProfile(object? obj)
         {
             if (!ValidateProfile())
                 return;
@@ -154,14 +154,14 @@ namespace SportsClubManagement.ViewModels
             return true;
         }
 
-        private bool CanChangePassword(object obj)
+        private bool CanChangePassword(object? obj)
         {
             return !string.IsNullOrWhiteSpace(CurrentPassword) && 
                    !string.IsNullOrWhiteSpace(NewPassword) && 
                    !string.IsNullOrWhiteSpace(ConfirmPassword);
         }
 
-        private void SelectAvatar(object obj)
+        private void SelectAvatar(object? obj)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg|All files (*.*)|*.*";
@@ -177,9 +177,11 @@ namespace SportsClubManagement.ViewModels
                     // Usually: bin\Debug\netX.X-windows\
                     // We want: SportsClubManagement\Data\Avatar
                     
-                    DirectoryInfo dirInfo = new DirectoryInfo(appDir);
+                    DirectoryInfo? dirInfo = new DirectoryInfo(appDir);
                     // Navigate up to SportsClubManagement folder
-                    string projectDir = dirInfo.Parent.Parent.Parent.FullName;
+                    // Check for null parents just in case (though unlikely in standard structure)
+                    string projectDir = dirInfo?.Parent?.Parent?.Parent?.FullName ?? appDir;
+                    
                     string avatarDir = Path.Combine(projectDir, "Data", "Avatar");
                     
                     if (!Directory.Exists(avatarDir))
@@ -204,7 +206,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void ChangePassword(object obj)
+        private void ChangePassword(object? obj)
         {
             if (_currentUser == null) return;
 

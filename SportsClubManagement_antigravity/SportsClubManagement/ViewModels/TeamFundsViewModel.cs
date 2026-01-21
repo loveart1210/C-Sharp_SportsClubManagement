@@ -10,11 +10,11 @@ namespace SportsClubManagement.ViewModels
 {
     public class TeamFundsViewModel : ViewModelBase
     {
-        private Team _team;
-        private ObservableCollection<FundTransaction> _transactions;
+        private Team? _team;
+        private ObservableCollection<FundTransaction> _transactions = new ObservableCollection<FundTransaction>();
         private decimal _totalBalance;
         private decimal _amount;
-        private string _description;
+        private string _description = string.Empty;
         private bool _isDeposit = true;
 
         public ObservableCollection<FundTransaction> Transactions
@@ -51,7 +51,7 @@ namespace SportsClubManagement.ViewModels
         public ICommand WithdrawCommand { get; }
         public ICommand ExportCommand { get; }
 
-        public TeamFundsViewModel(Team team = null)
+        public TeamFundsViewModel(Team? team = null)
         {
             _team = team;
             if (_team != null)
@@ -65,6 +65,7 @@ namespace SportsClubManagement.ViewModels
 
         private void LoadFundData()
         {
+            if (_team == null) return;
             var transactions = DataService.Instance.Transactions
                 .Where(t => t.TeamId == _team.Id)
                 .ToList();
@@ -73,14 +74,14 @@ namespace SportsClubManagement.ViewModels
             TotalBalance = _team.Balance;
         }
 
-        private bool CanTransaction(object parameter)
+        private bool CanTransaction(object? parameter)
         {
             return Amount > 0 && !string.IsNullOrWhiteSpace(Description);
         }
 
-        private void Deposit(object obj)
+        private void Deposit(object? obj)
         {
-            if (CanTransaction(obj))
+            if (CanTransaction(obj) && _team != null)
             {
                 var transaction = new FundTransaction
                 {
@@ -88,7 +89,7 @@ namespace SportsClubManagement.ViewModels
                     Amount = Amount,
                     Description = Description,
                     Type = "Deposit",
-                    ByUserId = DataService.Instance.CurrentUser?.Id
+                    ByUserId = DataService.Instance.CurrentUser?.Id ?? ""
                 };
                 
                 DataService.Instance.Transactions.Add(transaction);
@@ -102,9 +103,9 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void Withdraw(object obj)
+        private void Withdraw(object? obj)
         {
-            if (CanTransaction(obj))
+            if (CanTransaction(obj) && _team != null)
             {
                 if (_team.Balance >= Amount)
                 {
@@ -114,7 +115,7 @@ namespace SportsClubManagement.ViewModels
                         Amount = -Amount,
                         Description = Description,
                         Type = "Withdraw",
-                        ByUserId = DataService.Instance.CurrentUser?.Id
+                        ByUserId = DataService.Instance.CurrentUser?.Id ?? ""
                     };
                     
                     DataService.Instance.Transactions.Add(transaction);
@@ -129,7 +130,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void Export(object obj)
+        private void Export(object? obj)
         {
             if (_team != null)
             {
@@ -139,7 +140,7 @@ namespace SportsClubManagement.ViewModels
                 var notification = new Notification
                 {
                     TeamId = _team.Id,
-                    ByUserId = DataService.Instance.CurrentUser?.Id,
+                    ByUserId = DataService.Instance.CurrentUser?.Id ?? "",
                     Title = "Xuất báo cáo tài chính",
                     Content = $"Báo cáo tài chính đã được xuất tại: {filePath}"
                 };

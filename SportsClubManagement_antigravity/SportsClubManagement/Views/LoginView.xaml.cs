@@ -16,7 +16,7 @@ namespace SportsClubManagement.Views
             }
         }
 
-        private void Vm_OnLoginSuccess(object sender, System.EventArgs e)
+        private void Vm_OnLoginSuccess(object? sender, System.EventArgs e)
         {
             // Pass password to ViewModel before opening MainWindow
             var vm = this.DataContext as LoginViewModel;

@@ -15,7 +15,7 @@ namespace SportsClubManagement.Services
             "data.json"
         );
         
-        private static DataService _instance;
+        private static DataService? _instance;
         public static DataService Instance => _instance ??= new DataService();
 
         public List<User> Users { get; set; } = new List<User>();
@@ -27,7 +27,7 @@ namespace SportsClubManagement.Services
         public List<FundTransaction> Transactions { get; set; } = new List<FundTransaction>();
         public List<Notification> Notifications { get; set; } = new List<Notification>();
 
-        public User CurrentUser { get; set; }
+        public User? CurrentUser { get; set; }
 
         public DataService()
         {
@@ -256,14 +256,14 @@ namespace SportsClubManagement.Services
 
     public class DataWrapper
     {
-        public List<User> Users { get; set; }
-        public List<Team> Teams { get; set; }
-        public List<TeamMember> TeamMembers { get; set; }
-        public List<Subject> Subjects { get; set; }
-        public List<Session> Sessions { get; set; }
-        public List<Attendance> Attendances { get; set; }
-        public List<FundTransaction> Transactions { get; set; }
-        public List<Notification> Notifications { get; set; }
+        public List<User> Users { get; set; } = new List<User>();
+        public List<Team> Teams { get; set; } = new List<Team>();
+        public List<TeamMember> TeamMembers { get; set; } = new List<TeamMember>();
+        public List<Subject> Subjects { get; set; } = new List<Subject>();
+        public List<Session> Sessions { get; set; } = new List<Session>();
+        public List<Attendance> Attendances { get; set; } = new List<Attendance>();
+        public List<FundTransaction> Transactions { get; set; } = new List<FundTransaction>();
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }
 

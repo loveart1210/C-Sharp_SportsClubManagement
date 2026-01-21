@@ -10,17 +10,17 @@ namespace SportsClubManagement.ViewModels
 {
     public class TeamMembersViewModel : ViewModelBase
     {
-        private Team _team;
-        private ObservableCollection<MemberDisplay> _members;
-        private ObservableCollection<MemberDisplay> _allMembers;
+        private Team? _team;
+        private ObservableCollection<MemberDisplay> _members = new ObservableCollection<MemberDisplay>();
+        private ObservableCollection<MemberDisplay> _allMembers = new ObservableCollection<MemberDisplay>();
         private string _searchText = string.Empty;
         private string _filterRole = "All";
         private string _filterSubject = "All";
         private string _filterSession = "All";
 
         private ObservableCollection<string> _roles = new ObservableCollection<string> { "All", "Founder", "Admin", "Coach", "Member" };
-        private ObservableCollection<Subject> _availableSubjects;
-        private ObservableCollection<Session> _availableSessions;
+        private ObservableCollection<Subject> _availableSubjects = new ObservableCollection<Subject>();
+        private ObservableCollection<Session> _availableSessions = new ObservableCollection<Session>();
 
         public ObservableCollection<string> Roles => _roles;
 
@@ -85,7 +85,7 @@ namespace SportsClubManagement.ViewModels
         public ICommand RemoveMemberCommand { get; }
         public ICommand AddMemberCommand { get; }
 
-        public TeamMembersViewModel(Team team = null)
+        public TeamMembersViewModel(Team? team = null)
         {
             _team = team;
             RemoveMemberCommand = new RelayCommand(RemoveMember);
@@ -98,6 +98,8 @@ namespace SportsClubManagement.ViewModels
 
         private void LoadMembers()
         {
+            if (_team == null) return;
+
             _allMembers = new ObservableCollection<MemberDisplay>();
             foreach (var tm in DataService.Instance.TeamMembers.Where(x => x.TeamId == _team.Id))
             {
@@ -110,7 +112,7 @@ namespace SportsClubManagement.ViewModels
                         FullName = user.FullName,
                         Email = user.Email,
                         Role = tm.Role,
-                        AvatarPath = user.AvatarPath
+                        AvatarPath = user.AvatarPath ?? ""
                     });
                 }
             }
@@ -120,6 +122,7 @@ namespace SportsClubManagement.ViewModels
 
         private void LoadFilters()
         {
+            if (_team == null) return;
             var subjects = DataService.Instance.Subjects.Where(s => s.TeamId == _team.Id).ToList();
             subjects.Insert(0, new Subject { Id = "All", Name = "All Subjects" });
             AvailableSubjects = new ObservableCollection<Subject>(subjects);
@@ -176,9 +179,9 @@ namespace SportsClubManagement.ViewModels
             Members = new ObservableCollection<MemberDisplay>(filtered.ToList());
         }
 
-        private void RemoveMember(object parameter)
+        private void RemoveMember(object? parameter)
         {
-            if (parameter is MemberDisplay member)
+            if (parameter is MemberDisplay member && _team != null)
             {
                 var tm = DataService.Instance.TeamMembers.FirstOrDefault(x => x.TeamId == _team.Id && x.UserId == member.UserId);
                 if (tm != null)
@@ -190,7 +193,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void AddMember(object obj)
+        private void AddMember(object? obj)
         {
             // Mock - needs dialog in real app
         }
@@ -198,10 +201,10 @@ namespace SportsClubManagement.ViewModels
 
     public class MemberDisplay
     {
-        public string UserId { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Role { get; set; }
-        public string AvatarPath { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Role { get; set; } = "Member";
+        public string AvatarPath { get; set; } = string.Empty;
     }
 }

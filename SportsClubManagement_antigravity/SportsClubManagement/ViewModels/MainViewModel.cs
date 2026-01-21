@@ -9,10 +9,10 @@ namespace SportsClubManagement.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private object _currentView;
-        private string _userName;
-        private string _userRole;
-        private string _userAvatar;
+        private object _currentView = new object();
+        private string _userName = string.Empty;
+        private string _userRole = string.Empty;
+        private string _userAvatar = string.Empty;
 
         public object CurrentView
         {
@@ -56,7 +56,6 @@ namespace SportsClubManagement.ViewModels
             }
 
             NavigateToDashboardCommand = new RelayCommand(o => CurrentView = new DashboardViewModel());
-            NavigateToDashboardCommand = new RelayCommand(o => CurrentView = new DashboardViewModel());
             NavigateToTeamsCommand = new RelayCommand(o => 
             {
                 var teamsVM = new TeamsViewModel();
@@ -84,7 +83,7 @@ namespace SportsClubManagement.ViewModels
             CurrentView = new DashboardViewModel();
         }
 
-        private void ExecuteLogout(object obj)
+        private void ExecuteLogout(object? obj)
         {
             DataService.Instance.CurrentUser = null;
             

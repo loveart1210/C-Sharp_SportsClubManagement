@@ -8,7 +8,7 @@ namespace SportsClubManagement.ViewModels
 {
     public class DashboardViewModel : ViewModelBase
     {
-        private string _welcomeMessage;
+        private string _welcomeMessage = string.Empty;
         private int _totalTeams;
         private int _upcomingSessions;
         private int _totalMembers;

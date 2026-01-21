@@ -11,14 +11,14 @@ namespace SportsClubManagement.ViewModels
 {
     public class AttendanceViewModel : ViewModelBase
     {
-        private Team _team;
-        private Session _selectedSession;
+        private Team? _team;
+        private Session? _selectedSession;
         private DateTime _selectedDate;
-        private ObservableCollection<Session> _sessions;
-        private ObservableCollection<AttendanceRecord> _attendanceRecords;
-        private string _attendanceSummary;
+        private ObservableCollection<Session> _sessions = new ObservableCollection<Session>();
+        private ObservableCollection<AttendanceRecord> _attendanceRecords = new ObservableCollection<AttendanceRecord>();
+        private string _attendanceSummary = string.Empty;
 
-        public Team Team
+        public Team? Team
         {
             get => _team;
             set => SetProperty(ref _team, value);
@@ -40,7 +40,7 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _sessions, value);
         }
 
-        public Session SelectedSession
+        public Session? SelectedSession
         {
             get => _selectedSession;
             set
@@ -81,7 +81,7 @@ namespace SportsClubManagement.ViewModels
 
         public ICommand SaveAttendanceCommand { get; }
 
-        public AttendanceViewModel(Team team = null)
+        public AttendanceViewModel(Team? team = null)
         {
             _team = team;
             _selectedDate = DateTime.Today;
@@ -116,7 +116,7 @@ namespace SportsClubManagement.ViewModels
 
         private void LoadAttendance()
         {
-            if (_selectedSession == null)
+            if (_selectedSession == null || _team == null)
             {
                 AttendanceRecords = new ObservableCollection<AttendanceRecord>();
                 AttendanceSummary = "";
@@ -162,9 +162,9 @@ namespace SportsClubManagement.ViewModels
             OnPropertyChanged(nameof(IsFounderOrCoach));
         }
 
-        private bool CanSaveAttendance(object obj) => IsFounderOrCoach;
+        private bool CanSaveAttendance(object? obj) => IsFounderOrCoach;
 
-        private void SaveAttendance(object obj)
+        private void SaveAttendance(object? obj)
         {
             if (_selectedSession == null) return;
 
@@ -198,11 +198,11 @@ namespace SportsClubManagement.ViewModels
 
     public class AttendanceRecord : ViewModelBase
     {
-        public string AttendanceId { get; set; }
-        public string SessionId { get; set; }
-        public string UserId { get; set; }
-        public string UserName { get; set; }
-        public string Role { get; set; }
+        public string AttendanceId { get; set; } = string.Empty;
+        public string SessionId { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
         
         private bool _isPresent;
         public bool IsPresent 
@@ -211,7 +211,7 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _isPresent, value);
         }
         
-        private string _note;
+        private string _note = string.Empty;
         public string Note 
         { 
             get => _note; 

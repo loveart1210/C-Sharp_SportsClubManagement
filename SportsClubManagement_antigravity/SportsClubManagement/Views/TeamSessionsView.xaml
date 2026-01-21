@@ -15,6 +15,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="220"/>
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar: Calendar & Add Session Form -->
@@ -96,6 +97,69 @@
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
+
+        <!-- Right Side: Filters (Vertical) -->
+        <Border Grid.Column="2" Margin="15,0,0,0" Background="#FAFAFA" BorderBrush="#EEE" BorderThickness="1,0,0,0" Padding="10">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Bộ lọc" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="Trạng thái" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding FilterStatus}" VerticalContentAlignment="Center" Padding="5"/>
+                    </StackPanel>
+                    
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Ngày" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                            <ComboBox ItemsSource="{Binding DayOptions}" SelectedItem="{Binding FilterDay}" VerticalContentAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Tháng" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                            <ComboBox ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding FilterMonth}" VerticalContentAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="Năm" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding YearOptions}" SelectedItem="{Binding FilterYear}" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="Buổi tập" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding SessionNameOptions}" SelectedItem="{Binding FilterSessionName}" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="Môn" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding SubjectNameOptions}" SelectedItem="{Binding FilterSubjectName}" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Grid Margin="0,0,0,10">
+                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Bắt đầu" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                            <ComboBox ItemsSource="{Binding StartTimeOptions}" SelectedItem="{Binding FilterStartTime}" VerticalContentAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Kết thúc" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
+                            <ComboBox ItemsSource="{Binding EndTimeOptions}" SelectedItem="{Binding FilterEndTime}" VerticalContentAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <Button Content="Xóa bộ lọc" Command="{Binding ClearFiltersCommand}" Margin="0,10,0,0" Padding="10,8" Background="#9E9E9E" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
 
         <!-- Member Selection Modal Overlay -->
         <Grid Grid.ColumnSpan="2" Background="#7F000000" Visibility="{Binding IsMemberSelectionVisible, Converter={StaticResource BooleanToVisibilityConverter}}">

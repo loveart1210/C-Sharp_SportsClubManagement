@@ -10,10 +10,10 @@ namespace SportsClubManagement.ViewModels
 {
     public class UserManagementViewModel : ViewModelBase
     {
-        private ObservableCollection<User> _users;
-        private string _searchText;
-        private string _filterRole;
-        private ObservableCollection<User> _allUsers;
+        private ObservableCollection<User> _users = new ObservableCollection<User>();
+        private string _searchText = string.Empty;
+        private string _filterRole = "All";
+        private ObservableCollection<User> _allUsers = new ObservableCollection<User>();
 
         public ObservableCollection<User> Users
         {
@@ -72,7 +72,7 @@ namespace SportsClubManagement.ViewModels
             Users = new ObservableCollection<User>(filtered.ToList());
         }
 
-        private void ResetPassword(object obj)
+        private void ResetPassword(object? obj)
         {
             if (obj is User user)
             {
@@ -86,7 +86,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void DeleteUser(object obj)
+        private void DeleteUser(object? obj)
         {
             if (obj is User deleteUser && deleteUser.Id != DataService.Instance.CurrentUser?.Id)
             {

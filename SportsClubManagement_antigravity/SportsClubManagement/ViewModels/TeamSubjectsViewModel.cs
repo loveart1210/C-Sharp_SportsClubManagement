@@ -9,16 +9,16 @@ namespace SportsClubManagement.ViewModels
 {
     public class TeamSubjectsViewModel : ViewModelBase
     {
-        private Team _team;
-        private ObservableCollection<Subject> _subjects;
-        private Subject _selectedSubject;
+        private Team? _team;
+        private ObservableCollection<Subject> _subjects = new ObservableCollection<Subject>();
+        private Subject? _selectedSubject;
         private string _newSubjectName = string.Empty;
         private string _newSubjectDesc = string.Empty;
         private string _searchText = string.Empty;
         private bool _isEditing;
-        private Subject _editingSubject;
+        private Subject? _editingSubject;
 
-        private ObservableCollection<Subject> _allSubjects;
+        private ObservableCollection<Subject> _allSubjects = new ObservableCollection<Subject>();
 
         public ObservableCollection<Subject> Subjects
         {
@@ -26,7 +26,7 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _subjects, value);
         }
 
-        public Subject SelectedSubject
+        public Subject? SelectedSubject
         {
             get => _selectedSubject;
             set => SetProperty(ref _selectedSubject, value);
@@ -88,7 +88,7 @@ namespace SportsClubManagement.ViewModels
         public ICommand EditSubjectCommand { get; }
         public ICommand CancelEditCommand { get; }
 
-        public TeamSubjectsViewModel(Team team = null)
+        public TeamSubjectsViewModel(Team? team = null)
         {
             _team = team;
             if (_team != null)
@@ -131,12 +131,12 @@ namespace SportsClubManagement.ViewModels
             Subjects = new ObservableCollection<Subject>(filtered.ToList());
         }
 
-        private bool CanAddSubject(object obj)
+        private bool CanAddSubject(object? obj)
         {
             return IsFounderOrCoach && !string.IsNullOrWhiteSpace(NewSubjectName);
         }
 
-        private void AddSubject(object obj)
+        private void AddSubject(object? obj)
         {
             if (IsEditing && _editingSubject != null)
             {
@@ -159,17 +159,21 @@ namespace SportsClubManagement.ViewModels
             }
             else
             {
-                // Add New
-                var newSub = new Subject
+                var currentUser = DataService.Instance.CurrentUser;
+                if (currentUser != null && _team != null)
                 {
-                    TeamId = _team.Id,
-                    Name = NewSubjectName,
-                    Description = NewSubjectDesc,
-                    UserId = DataService.Instance.CurrentUser.Id,
-                    CreatedDate = DateTime.Now
-                };
-                DataService.Instance.Subjects.Add(newSub);
-                DataService.Instance.Save();
+                    // Add New
+                    var newSub = new Subject
+                    {
+                        TeamId = _team.Id,
+                        Name = NewSubjectName,
+                        Description = NewSubjectDesc,
+                        UserId = currentUser.Id,
+                        CreatedDate = DateTime.Now
+                    };
+                    DataService.Instance.Subjects.Add(newSub);
+                    DataService.Instance.Save();
+                }
             }
             
             NewSubjectName = string.Empty;
@@ -177,9 +181,9 @@ namespace SportsClubManagement.ViewModels
             LoadSubjects();
         }
 
-        private bool CanEditSubject(object obj) => IsFounderOrCoach;
+        private bool CanEditSubject(object? obj) => IsFounderOrCoach;
 
-        private void EditSubject(object obj)
+        private void EditSubject(object? obj)
         {
             if (obj is Subject s)
             {
@@ -190,7 +194,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void CancelEdit(object obj)
+        private void CancelEdit(object? obj)
         {
             IsEditing = false;
             _editingSubject = null;
@@ -198,9 +202,9 @@ namespace SportsClubManagement.ViewModels
             NewSubjectDesc = string.Empty;
         }
 
-        private bool CanRemoveSubject(object obj) => IsFounderOrCoach;
+        private bool CanRemoveSubject(object? obj) => IsFounderOrCoach;
 
-        private void RemoveSubject(object parameter)
+        private void RemoveSubject(object? parameter)
         {
             if (parameter is Subject sub)
             {

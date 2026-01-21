@@ -9,9 +9,9 @@ namespace SportsClubManagement.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
-        private string _username;
-        private string _password;
-        private string _errorMessage;
+        private string _username = string.Empty;
+        private string _password = string.Empty;
+        private string _errorMessage = string.Empty;
 
         public string Username
         {
@@ -41,7 +41,7 @@ namespace SportsClubManagement.ViewModels
             NavigateToRegisterCommand = new RelayCommand(ExecuteNavigateToRegister);
         }
 
-        private void ExecuteNavigateToRegister(object parameter)
+        private void ExecuteNavigateToRegister(object? parameter)
         {
             var registerView = new Views.RegisterView();
             registerView.Show();
@@ -58,12 +58,12 @@ namespace SportsClubManagement.ViewModels
             Application.Current.MainWindow = registerView;
         }
 
-        private bool CanExecuteLogin(object parameter)
+        private bool CanExecuteLogin(object? parameter)
         {
             return !string.IsNullOrWhiteSpace(Username) && !string.IsNullOrWhiteSpace(Password);
         }
 
-        private void ExecuteLogin(object parameter)
+        private void ExecuteLogin(object? parameter)
         {
             ErrorMessage = "";
 
@@ -86,6 +86,6 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        public event EventHandler OnLoginSuccess;
+        public event EventHandler? OnLoginSuccess;
     }
 }

@@ -10,12 +10,12 @@ namespace SportsClubManagement.ViewModels
 {
     public class RegisterViewModel : ViewModelBase
     {
-        private string _fullName;
+        private string _fullName = string.Empty;
         private DateTime _birthDate = DateTime.Now.AddYears(-18); // Default to 18 years ago
-        private string _email;
-        private string _username;
-        private string _password; // In a real app, use SecureString
-        private string _errorMessage;
+        private string _email = string.Empty;
+        private string _username = string.Empty;
+        private string _password = string.Empty; // In a real app, use SecureString
+        private string _errorMessage = string.Empty;
 
         public string FullName
         {
@@ -62,7 +62,7 @@ namespace SportsClubManagement.ViewModels
             NavigateToLoginCommand = new RelayCommand(ExecuteNavigateToLogin);
         }
 
-        private void ExecuteRegister(object parameter)
+        private void ExecuteRegister(object? parameter)
         {
             // Update password from parameter (PasswordBox binding workarounds usually involve this)
             // But for simplicity in MVVM without extra behaviors, we might bind to a normal TextBox or use code-behind to update ViewModel
@@ -141,7 +141,7 @@ namespace SportsClubManagement.ViewModels
             return true;
         }
 
-        private void ExecuteNavigateToLogin(object parameter)
+        private void ExecuteNavigateToLogin(object? parameter)
         {
             var loginView = new LoginView();
             loginView.Show();

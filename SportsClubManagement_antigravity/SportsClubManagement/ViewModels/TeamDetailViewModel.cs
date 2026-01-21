@@ -11,17 +11,17 @@ namespace SportsClubManagement.ViewModels
 {
     public class TeamDetailViewModel : ViewModelBase
     {
-        private Team _team;
-        private ObservableCollection<TeamMember> _members;
-        private ObservableCollection<Notification> _notifications;
+        private Team? _team;
+        private ObservableCollection<TeamMember> _members = new ObservableCollection<TeamMember>();
+        private ObservableCollection<Notification> _notifications = new ObservableCollection<Notification>();
         private int _selectedTabIndex;
 
         // Child ViewModels
-        public TeamSubjectsViewModel SubjectsVM { get; private set; }
-        public TeamSessionsViewModel SessionsVM { get; private set; }
-        public AttendanceViewModel AttendanceVM { get; private set; }
+        public TeamSubjectsViewModel? SubjectsVM { get; private set; }
+        public TeamSessionsViewModel? SessionsVM { get; private set; }
+        public AttendanceViewModel? AttendanceVM { get; private set; }
 
-        public Team Team
+        public Team? Team
         {
             get => _team;
             set
@@ -58,7 +58,7 @@ namespace SportsClubManagement.ViewModels
 
         public ICommand BackCommand { get; }
 
-        public event EventHandler OnBack;
+        public event EventHandler? OnBack;
 
         public void RefreshCurrentTab()
         {
@@ -81,7 +81,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        public TeamDetailViewModel(Team team = null)
+        public TeamDetailViewModel(Team? team = null)
         {
             _team = team;
             BackCommand = new RelayCommand(GoBack);
@@ -122,7 +122,7 @@ namespace SportsClubManagement.ViewModels
             Notifications = new ObservableCollection<Notification>(notifs);
         }
 
-        private void GoBack(object obj)
+        private void GoBack(object? obj)
         {
             OnBack?.Invoke(this, EventArgs.Empty);
         }

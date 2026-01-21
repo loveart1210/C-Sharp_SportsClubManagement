@@ -10,9 +10,9 @@ namespace SportsClubManagement.ViewModels
 {
     public class PersonalScheduleViewModel : ViewModelBase
     {
-        private User _currentUser;
-        private ObservableCollection<Subject> _subjects;
-        private ObservableCollection<Session> _sessions;
+        private User? _currentUser;
+        private ObservableCollection<Subject> _subjects = new ObservableCollection<Subject>();
+        // private ObservableCollection<Session> _sessions; // Removed unused field
         private DateTime _selectedDate;
         private int _selectedTabIndex;
         private bool _hasExplicitlySelectedDate = false;
@@ -20,11 +20,11 @@ namespace SportsClubManagement.ViewModels
         // Subject creation/editing
         private string _newSubjectName = string.Empty;
         private string _newSubjectDesc = string.Empty;
-        private Subject _editingSubject = null; // Track if editing
+        private Subject? _editingSubject = null; // Track if editing
 
         // Session creation
         private string _newSessionName = string.Empty;
-        private Subject _selectedSubject;
+        private Subject? _selectedSubject;
         private string _newSessionStart = string.Empty;
         private string _newSessionEnd = string.Empty;
         private string _newSessionNote = string.Empty;
@@ -39,15 +39,15 @@ namespace SportsClubManagement.ViewModels
         private string _filterStartTime = "Tất cả";
         private string _filterEndTime = "Tất cả";
         
-        private ObservableCollection<string> _dayOptions;
-        private ObservableCollection<string> _monthOptions;
-        private ObservableCollection<string> _yearOptions;
-        private ObservableCollection<string> _sessionNameOptions;
-        private ObservableCollection<string> _subjectNameOptions;
-        private ObservableCollection<string> _startTimeOptions;
-        private ObservableCollection<string> _endTimeOptions;
+        private ObservableCollection<string> _dayOptions = new ObservableCollection<string>();
+        private ObservableCollection<string> _monthOptions = new ObservableCollection<string>();
+        private ObservableCollection<string> _yearOptions = new ObservableCollection<string>();
+        private ObservableCollection<string> _sessionNameOptions = new ObservableCollection<string>();
+        private ObservableCollection<string> _subjectNameOptions = new ObservableCollection<string>();
+        private ObservableCollection<string> _startTimeOptions = new ObservableCollection<string>();
+        private ObservableCollection<string> _endTimeOptions = new ObservableCollection<string>();
 
-        private ObservableCollection<SessionViewItem> _sessionViewItems;
+        private ObservableCollection<SessionViewItem> _sessionViewItems = new ObservableCollection<SessionViewItem>();
         private System.Windows.Threading.DispatcherTimer _refreshTimer;
 
 
@@ -115,7 +115,7 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _newSessionName, value);
         }
 
-        public Subject SelectedSubject
+        public Subject? SelectedSubject
         {
             get => _selectedSubject;
             set => SetProperty(ref _selectedSubject, value);
@@ -202,8 +202,9 @@ namespace SportsClubManagement.ViewModels
 
         private void LoadSubjects()
         {
+            if (_currentUser == null) return;
             var list = DataService.Instance.Subjects
-                .Where(s => s.UserId == _currentUser.Id) // Filter by User
+                .Where(s => s.UserId == _currentUser.Id && s.TeamId == null) // Filter by User AND no Team
                 .ToList();
             Subjects = new ObservableCollection<Subject>(list);
             
@@ -223,6 +224,7 @@ namespace SportsClubManagement.ViewModels
 
         private void UpdateDynamicFilterOptions()
         {
+            if (_currentUser == null) return;
             var userSessions = DataService.Instance.Sessions.Where(s => s.UserId == _currentUser.Id).ToList();
             
             SessionNameOptions = new ObservableCollection<string>(new[] { "Tất cả" }.Concat(userSessions.Select(s => s.Name).Distinct()).ToList());
@@ -236,6 +238,7 @@ namespace SportsClubManagement.ViewModels
 
         private void LoadSessions()
         {
+            if (_currentUser == null) return;
             var now = DateTime.Now;
             var allSessions = DataService.Instance.Sessions
                 .Where(s => s.UserId == _currentUser.Id)
@@ -286,7 +289,7 @@ namespace SportsClubManagement.ViewModels
             );
         }
 
-        private void AttendSession(object obj)
+        private void AttendSession(object? obj)
         {
             if (obj is SessionViewItem item)
             {
@@ -326,13 +329,14 @@ namespace SportsClubManagement.ViewModels
             LoadSessions();
         }
 
-        private bool CanAddSubject(object obj)
+        private bool CanAddSubject(object? obj)
         {
             return !string.IsNullOrWhiteSpace(NewSubjectName);
         }
 
-        private void AddSubject(object obj)
+        private void AddSubject(object? obj)
         {
+            if (_currentUser == null) return;
             if (_editingSubject != null)
             {
                 // Update existing subject by removing and re-adding
@@ -369,7 +373,7 @@ namespace SportsClubManagement.ViewModels
             LoadSubjects();
         }
 
-        private void EditSubject(object obj)
+        private void EditSubject(object? obj)
         {
             if (obj is Subject s)
             {
@@ -379,7 +383,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void RemoveSubject(object obj)
+        private void RemoveSubject(object? obj)
         {
             if (obj is Subject s)
             {
@@ -389,13 +393,15 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private bool CanAddSession(object obj)
+        private bool CanAddSession(object? obj)
         {
             return !string.IsNullOrWhiteSpace(NewSessionName) && SelectedSubject != null;
         }
 
-        private void AddSession(object obj)
+        private void AddSession(object? obj)
         {
+            if (_currentUser == null || SelectedSubject == null) return;
+
             if (!TimeSpan.TryParse(NewSessionStart, out TimeSpan startTime) || 
                 !TimeSpan.TryParse(NewSessionEnd, out TimeSpan endTime))
             {
@@ -424,7 +430,7 @@ namespace SportsClubManagement.ViewModels
             NewSessionNote = "";
         }
 
-        private void RemoveSession(object obj)
+        private void RemoveSession(object? obj)
         {
             if (obj is SessionViewItem item)
             {
@@ -435,7 +441,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        private void ExportSchedule(object obj)
+        private void ExportSchedule(object? obj)
         {
             if (_currentUser != null)
             {

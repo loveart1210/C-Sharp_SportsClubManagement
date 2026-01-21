@@ -91,7 +91,7 @@
                                 Margin="10" Padding="12,10" HorizontalContentAlignment="Left" 
                                 Background="Transparent" Foreground="#333" FontSize="13" Cursor="Hand"/>
                         
-                        <Button Content="📅 Lịch tập" Command="{Binding NavigateToPersonalScheduleCommand}"
+                        <Button Content="📅 Lịch tập cá nhân" Command="{Binding NavigateToPersonalScheduleCommand}"
                                 Margin="10" Padding="12,10" HorizontalContentAlignment="Left" 
                                 Background="Transparent" Foreground="#333" FontSize="13" Cursor="Hand"/>
                         

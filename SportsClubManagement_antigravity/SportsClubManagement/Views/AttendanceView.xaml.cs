@@ -15,20 +15,15 @@ namespace SportsClubManagement.Views
         {
             if (DataContext is ViewModels.AttendanceViewModel vm)
             {
-                // vm.RefreshData(); // Try auto-refresh on load
                 System.Diagnostics.Debug.WriteLine($"AttendanceView Loaded. VM Sessions: {vm.Sessions?.Count}");
             }
             else
             {
-                // If DataContext is not set in XAML, set it here
                 if (DataContext == null)
                 {
-                    DataContext = new AttendanceViewModel();
-                    vm = DataContext as ViewModels.AttendanceViewModel;
-                    if (vm != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"AttendanceView Loaded. DataContext initialized. VM Sessions: {vm.Sessions?.Count}");
-                    }
+                    var newVm = new AttendanceViewModel();
+                    DataContext = newVm;
+                    System.Diagnostics.Debug.WriteLine($"AttendanceView Loaded. DataContext initialized. VM Sessions: {newVm.Sessions?.Count}");
                 }
                 else
                 {
