@@ -5,28 +5,31 @@ using System.Windows.Input;
 using SportsClubManagement.Helpers;
 using SportsClubManagement.Models;
 using SportsClubManagement.Services;
+using SportsClubManagement.Views; // Added for MainViewModel navigation
 
 namespace SportsClubManagement.ViewModels
 {
     public class TeamDetailViewModel : ViewModelBase
     {
         private Team _team;
-        private string _selectedTabIndex;
         private ObservableCollection<TeamMember> _members;
-        private ObservableCollection<Subject> _subjects;
-        private ObservableCollection<Session> _sessions;
         private ObservableCollection<Notification> _notifications;
-        
+        private int _selectedTabIndex;
+
+        // Child ViewModels
+        public TeamSubjectsViewModel SubjectsVM { get; private set; }
+        public TeamSessionsViewModel SessionsVM { get; private set; }
+        public AttendanceViewModel AttendanceVM { get; private set; }
+
         public Team Team
         {
             get => _team;
-            set => SetProperty(ref _team, value);
-        }
-
-        public string SelectedTabIndex
-        {
-            get => _selectedTabIndex;
-            set => SetProperty(ref _selectedTabIndex, value);
+            set
+            {
+                SetProperty(ref _team, value);
+                LoadTeamData();
+                InitializeChildViewModels();
+            }
         }
 
         public ObservableCollection<TeamMember> Members
@@ -35,68 +38,93 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _members, value);
         }
 
-        public ObservableCollection<Subject> Subjects
-        {
-            get => _subjects;
-            set => SetProperty(ref _subjects, value);
-        }
-
-        public ObservableCollection<Session> Sessions
-        {
-            get => _sessions;
-            set => SetProperty(ref _sessions, value);
-        }
-
         public ObservableCollection<Notification> Notifications
         {
             get => _notifications;
             set => SetProperty(ref _notifications, value);
         }
 
+        public int SelectedTabIndex
+        {
+            get => _selectedTabIndex;
+            set
+            {
+                if (SetProperty(ref _selectedTabIndex, value))
+                {
+                    RefreshCurrentTab();
+                }
+            }
+        }
+
         public ICommand BackCommand { get; }
+
+        public event EventHandler OnBack;
+
+        public void RefreshCurrentTab()
+        {
+            switch (SelectedTabIndex)
+            {
+                case 1: 
+                    SubjectsVM?.RefreshData(); 
+                    break;
+                case 2: 
+                    SessionsVM?.RefreshData(); 
+                    break;
+                case 3: 
+                    // Sync date from Sessions tab to Attendance tab for better UX
+                    if (SessionsVM != null && AttendanceVM != null)
+                    {
+                        AttendanceVM.SelectedDate = SessionsVM.SelectedDate;
+                    }
+                    AttendanceVM?.RefreshData(); 
+                    break;
+            }
+        }
 
         public TeamDetailViewModel(Team team = null)
         {
-            Team = team;
-            SelectedTabIndex = "0";
-            BackCommand = new RelayCommand(ExecuteBack);
-            LoadTeamData();
+            _team = team;
+            BackCommand = new RelayCommand(GoBack);
+            if (_team != null)
+            {
+                LoadTeamData();
+                InitializeChildViewModels();
+            }
+        }
+
+        private void InitializeChildViewModels()
+        {
+            if (_team != null)
+            {
+                SubjectsVM = new TeamSubjectsViewModel(_team);
+                SessionsVM = new TeamSessionsViewModel(_team);
+                AttendanceVM = new AttendanceViewModel(_team);
+                
+                OnPropertyChanged(nameof(SubjectsVM));
+                OnPropertyChanged(nameof(SessionsVM));
+                OnPropertyChanged(nameof(AttendanceVM));
+            }
         }
 
         private void LoadTeamData()
         {
-            if (Team == null) return;
+            if (_team == null) return;
 
-            // Load members
-            var memberList = DataService.Instance.TeamMembers
-                .Where(tm => tm.TeamId == Team.Id)
-                .ToList();
-            Members = new ObservableCollection<TeamMember>(memberList);
+            // Load Members
+            var members = DataService.Instance.TeamMembers.Where(tm => tm.TeamId == _team.Id).ToList();
+            Members = new ObservableCollection<TeamMember>(members);
 
-            // Load subjects
-            var subjectList = DataService.Instance.Subjects
-                .Where(s => s.TeamId == Team.Id)
+            // Load Notifications
+            var notifs = DataService.Instance.Notifications
+                .Where(n => n.TeamId == _team.Id)
+                .OrderByDescending(n => n.CreatedDate)
                 .ToList();
-            Subjects = new ObservableCollection<Subject>(subjectList);
-
-            // Load sessions
-            var sessionList = DataService.Instance.Sessions
-                .Where(s => s.TeamId == Team.Id)
-                .ToList();
-            Sessions = new ObservableCollection<Session>(sessionList);
-
-            // Load notifications
-            var notificationList = DataService.Instance.Notifications
-                .Where(n => n.TeamId == Team.Id)
-                .ToList();
-            Notifications = new ObservableCollection<Notification>(notificationList);
+            Notifications = new ObservableCollection<Notification>(notifs);
         }
 
-        private void ExecuteBack(object parameter)
+        private void GoBack(object obj)
         {
             OnBack?.Invoke(this, EventArgs.Empty);
         }
-
-        public event EventHandler OnBack;
     }
 }

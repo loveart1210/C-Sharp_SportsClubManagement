@@ -4,9 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
+             xmlns:views="clr-namespace:SportsClubManagement.Views"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
 
+
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type vm:TeamSubjectsViewModel}">
+            <views:TeamSubjectsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TeamSessionsViewModel}">
+            <views:TeamSessionsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AttendanceViewModel}">
+            <views:AttendanceView/>
+        </DataTemplate>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -22,7 +35,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <Image Source="{Binding Team.AvatarPath}" Width="60" Height="60" Stretch="UniformToFill" Grid.Column="0" Margin="0,0,15,0"/>
+
             
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Text="{Binding Team.Name}" FontSize="24" FontWeight="Bold" Foreground="#1976D2"/>
@@ -34,7 +47,8 @@
         </Grid>
 
         <!-- Tabs -->
-        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}">
+        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    SelectionChanged="TabControl_SelectionChanged">
             <!-- Tab 1: Members -->
             <TabItem Header="👥 Thành viên">
                 <Grid>
@@ -57,50 +71,17 @@
 
             <!-- Tab 2: Subjects -->
             <TabItem Header="📚 Môn tập">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <TextBlock Text="Danh sách môn tập" FontSize="14" FontWeight="Bold" Margin="15,15,15,10"/>
-                    
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Subjects}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="15">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Tên môn" Binding="{Binding Name}" Width="150"/>
-                            <DataGridTextColumn Header="Mô tả" Binding="{Binding Description}" Width="*"/>
-                            <DataGridTextColumn Header="Số người" Binding="{Binding ParticipantCount}" Width="80"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
+                <ContentControl Content="{Binding SubjectsVM}"/>
             </TabItem>
 
             <!-- Tab 3: Sessions -->
             <TabItem Header="🏋️ Buổi tập">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <TextBlock Text="Danh sách buổi tập" FontSize="14" FontWeight="Bold" Margin="15,15,15,10"/>
-                    
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Sessions}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="15">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Tên buổi" Binding="{Binding Name}" Width="150"/>
-                            <DataGridTextColumn Header="Bắt đầu" Binding="{Binding StartTime}" Width="150"/>
-                            <DataGridTextColumn Header="Kết thúc" Binding="{Binding EndTime}" Width="150"/>
-                            <DataGridTextColumn Header="Ghi chú" Binding="{Binding Note}" Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
+                 <ContentControl Content="{Binding SessionsVM}"/>
             </TabItem>
 
             <!-- Tab 4: Attendance -->
             <TabItem Header="✅ Điểm danh">
-                <Grid>
-                    <TextBlock Text="Tab Điểm danh sẽ được cập nhật" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </Grid>
+                 <ContentControl Content="{Binding AttendanceVM}"/>
             </TabItem>
 
             <!-- Tab 5: Notifications -->

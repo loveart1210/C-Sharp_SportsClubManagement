@@ -3,60 +3,127 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:SportsClubManagement.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
-    <Grid>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left: Calendar -->
-        <Border BorderBrush="#DDD" BorderThickness="0,0,1,0" Padding="10">
-            <StackPanel>
-                <TextBlock Text="Select Date" FontWeight="Bold" Margin="0,0,0,10"/>
-                <Calendar SelectedDate="{Binding SelectedDate}" Margin="0,0,0,20"/>
-                
-                <TextBlock Text="Add New Session" FontWeight="Bold" Margin="0,0,0,10"/>
+        <!-- Sidebar: Calendar & Add Session Form -->
+        <StackPanel Grid.Column="0" Margin="0,0,20,0">
+            <Calendar SelectedDate="{Binding SelectedDate}" Margin="0,0,0,20"/>
+            
+            <!-- Add Session Form (Founder/Coach Only) -->
+            <Border Background="#F9F9F9" Padding="15" CornerRadius="5" 
+                    Visibility="{Binding IsFounderOrCoach, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel>
-                    <TextBlock Text="Session Name"/>
-                    <TextBox Text="{Binding NewSessionName}" Margin="0,0,0,5" Padding="3"/>
-
-                    <TextBlock Text="Subject"/>
-                    <ComboBox ItemsSource="{Binding AvailableSubjects}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSubject}" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="Note"/>
-                    <TextBox Text="{Binding NewSessionNote}" Margin="0,0,0,10" Padding="3"/>
+                    <TextBlock Text="Thêm buổi tập" FontWeight="Bold" Margin="0,0,0,10"/>
                     
-                    <Button Content="Add Session" Command="{Binding AddSessionCommand}" Padding="5"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
+                    <TextBlock Text="Tên buổi tập" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding NewSessionName, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,10"/>
+                    
+                    <TextBlock Text="Môn tập" Margin="0,0,0,5"/>
+                    <ComboBox ItemsSource="{Binding AvailableSubjects}" SelectedItem="{Binding SelectedSubject}" DisplayMemberPath="Name" Margin="0,0,0,10" Padding="5"/>
+                    
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <TextBlock Text="Bắt đầu (HH:mm)" FontSize="11"/>
+                            <TextBox Text="{Binding NewSessionStartString}" Padding="5"/> 
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                            <TextBlock Text="Kết thúc (HH:mm)" FontSize="11"/>
+                            <TextBox Text="{Binding NewSessionEndString}" Padding="5"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <TextBlock Text="Ghi chú" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding NewSessionNote}" Padding="5" Margin="0,0,0,10"/>
 
-        <!-- Right: Daily Schedule -->
-        <Grid Grid.Column="1" Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+                    <!-- Member Participation Button -->
+                    <Button Content="👥 Thành viên tham gia" Command="{Binding OpenMemberSelectionCommand}"
+                            Background="#607D8B" Foreground="White" Padding="10,5" BorderThickness="0" Margin="0,0,0,10"/>
+
+                    <Button Content="Thêm Buổi Tập" Command="{Binding AddSessionCommand}" 
+                            Background="#2196F3" Foreground="White" Padding="10" 
+                            BorderThickness="0" Margin="0,0,0,10"/>
+                </StackPanel>
+            </Border>
+
+             <!-- Export Button (Visible to ALL, but maybe different placement/style) -->
+            <Button Content="Xuất Lịch (CSV)" Command="{Binding ExportScheduleCommand}"
+                    Background="#FF9800" Foreground="White" Padding="10" BorderThickness="0" Margin="0,10,0,0"/>
+
+        </StackPanel>
+
+        <!-- Main: Sessions List -->
+        <DockPanel Grid.Column="1">
+            <TextBlock DockPanel.Dock="Top" Text="{Binding ScheduleHeaderText}" 
+                       FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
             
-            <TextBlock Text="{Binding SelectedDate, StringFormat='Schedule for {0:D}'}" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-            
-            <DataGrid Grid.Row="1" ItemsSource="{Binding Sessions}" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid ItemsSource="{Binding Sessions}" AutoGenerateColumns="False" CanUserAddRows="False" 
+                      HeadersVisibility="Column" GridLinesVisibility="Horizontal" Background="White" BorderBrush="#EEE"
+                      CanUserResizeColumns="True" SelectionMode="Single" IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Time" Binding="{Binding StartTime, StringFormat=HH:mm}" Width="60"/>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="150"/>
-                    <DataGridTextColumn Header="Note" Binding="{Binding Note}" Width="*"/>
-                    <DataGridTemplateColumn Header="Action" Width="80">
-                         <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Del" Command="{Binding DataContext.RemoveSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                    CommandParameter="{Binding}" Background="#FFD4D4"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTextColumn Header="Ngày" Binding="{Binding StartTime, StringFormat=dd/MM/yyyy}" Width="85"/>
+                    <DataGridTextColumn Header="Bắt đầu" Binding="{Binding StartTime, StringFormat=HH:mm}" Width="65"/>
+                    <DataGridTextColumn Header="Kết thúc" Binding="{Binding EndTime, StringFormat=HH:mm}" Width="65"/>
+                    <DataGridTextColumn Header="Tên buổi tập" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Ghi chú" Binding="{Binding Note}" Width="150"/>
+                    
+                    <!-- Delete Action (Founder/Coach Only) -->
+                    <DataGridTemplateColumn Width="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="🗑️" Command="{Binding DataContext.RemoveSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                        CommandParameter="{Binding}" 
+                                        Visibility="{Binding DataContext.IsFounderOrCoach, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Background="Transparent" Foreground="Red" BorderThickness="0" FontSize="14" Cursor="Hand"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
+        </DockPanel>
+
+        <!-- Member Selection Modal Overlay -->
+        <Grid Grid.ColumnSpan="2" Background="#7F000000" Visibility="{Binding IsMemberSelectionVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Background="White" Width="500" Height="400" CornerRadius="10" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Chọn thành viên tham gia" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                    
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding MemberSelectionList}" AutoGenerateColumns="False" CanUserAddRows="False" BorderBrush="#EEE">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
+                            <DataGridTextColumn Header="Tên thành viên" Binding="{Binding FullName}" Width="*" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Vai trò" Binding="{Binding Role}" Width="100" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                        <Button Content="Xong" Command="{Binding CloseMemberSelectionCommand}" 
+                                Background="#4CAF50" Foreground="White" Padding="20,10" BorderThickness="0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
+
     </Grid>
 </UserControl>

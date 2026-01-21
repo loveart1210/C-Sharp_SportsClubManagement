@@ -11,32 +11,25 @@ namespace SportsClubManagement.ViewModels
     {
         private Team _team;
         private ObservableCollection<Subject> _subjects;
+        private Subject _selectedSubject;
         private string _newSubjectName = string.Empty;
         private string _newSubjectDesc = string.Empty;
         private string _searchText = string.Empty;
-        private string _filterMember = "All";
-        private string _filterSession = "All";
+        private bool _isEditing;
+        private Subject _editingSubject;
 
-        private ObservableCollection<MemberDisplay> _availableMembers;
-        private ObservableCollection<Session> _availableSessions;
         private ObservableCollection<Subject> _allSubjects;
-
-        public ObservableCollection<MemberDisplay> AvailableMembers
-        {
-            get => _availableMembers;
-            set => SetProperty(ref _availableMembers, value);
-        }
-
-        public ObservableCollection<Session> AvailableSessions
-        {
-            get => _availableSessions;
-            set => SetProperty(ref _availableSessions, value);
-        }
 
         public ObservableCollection<Subject> Subjects
         {
             get => _subjects;
             set => SetProperty(ref _subjects, value);
+        }
+
+        public Subject SelectedSubject
+        {
+            get => _selectedSubject;
+            set => SetProperty(ref _selectedSubject, value);
         }
 
         public string NewSubjectName
@@ -61,28 +54,39 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        public string FilterMember
+        public bool IsEditing
         {
-            get => _filterMember;
+            get => _isEditing;
             set
             {
-                SetProperty(ref _filterMember, value);
-                ApplyFilters();
+                SetProperty(ref _isEditing, value);
+                OnPropertyChanged(nameof(FormTitle));
+                OnPropertyChanged(nameof(ButtonText));
             }
         }
 
-        public string FilterSession
+        public string FormTitle => IsEditing ? "Cập nhật môn tập" : "Thêm môn tập mới";
+        public string ButtonText => IsEditing ? "Lưu thay đổi" : "Thêm Môn Tập";
+
+        public bool IsFounderOrCoach
         {
-            get => _filterSession;
-            set
+            get
             {
-                SetProperty(ref _filterSession, value);
-                ApplyFilters();
+                if (_team == null) return false;
+                var currentUser = DataService.Instance.CurrentUser;
+                if (currentUser == null) return false;
+                
+                var member = DataService.Instance.TeamMembers
+                    .FirstOrDefault(tm => tm.TeamId == _team.Id && tm.UserId == currentUser.Id);
+                
+                return member != null && (member.Role == "Founder" || member.Role == "Coach");
             }
         }
 
         public ICommand AddSubjectCommand { get; }
         public ICommand RemoveSubjectCommand { get; }
+        public ICommand EditSubjectCommand { get; }
+        public ICommand CancelEditCommand { get; }
 
         public TeamSubjectsViewModel(Team team = null)
         {
@@ -92,72 +96,36 @@ namespace SportsClubManagement.ViewModels
                 LoadSubjects();
             }
             AddSubjectCommand = new RelayCommand(AddSubject, CanAddSubject);
-            RemoveSubjectCommand = new RelayCommand(RemoveSubject);
+            RemoveSubjectCommand = new RelayCommand(RemoveSubject, CanRemoveSubject);
+            EditSubjectCommand = new RelayCommand(EditSubject, CanEditSubject);
+            CancelEditCommand = new RelayCommand(CancelEdit);
+        }
+
+        public void RefreshData()
+        {
+            LoadSubjects();
         }
 
         private void LoadSubjects()
         {
+            if (_team == null) return;
             var list = DataService.Instance.Subjects.Where(s => s.TeamId == _team.Id).ToList();
             _allSubjects = new ObservableCollection<Subject>(list);
             
-            LoadFilters();
             ApplyFilters();
-        }
-
-        private void LoadFilters()
-        {
-            var sessions = DataService.Instance.Sessions.Where(s => s.TeamId == _team.Id).ToList();
-            sessions.Insert(0, new Session { Id = "All", Name = "All Sessions" });
-            AvailableSessions = new ObservableCollection<Session>(sessions);
-
-            var members = new ObservableCollection<MemberDisplay>();
-            members.Add(new MemberDisplay { UserId = "All", FullName = "All Members" });
-
-            foreach (var tm in DataService.Instance.TeamMembers.Where(x => x.TeamId == _team.Id))
-            {
-                var user = DataService.Instance.Users.FirstOrDefault(u => u.Id == tm.UserId);
-                if (user != null)
-                {
-                    members.Add(new MemberDisplay { UserId = user.Id, FullName = user.FullName });
-                }
-            }
-            AvailableMembers = members;
+            OnPropertyChanged(nameof(IsFounderOrCoach));
         }
 
         private void ApplyFilters()
         {
+            if (_allSubjects == null) return;
+
             var filtered = _allSubjects.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 filtered = filtered.Where(s => s.Name.ToLower().Contains(SearchText.ToLower()) || 
-                                             s.Description.ToLower().Contains(SearchText.ToLower()));
-            }
-
-            if (FilterSession != "All")
-            {
-                // Subjects that have this session
-                var session = DataService.Instance.Sessions.FirstOrDefault(s => s.Id == FilterSession);
-                if (session != null)
-                {
-                    filtered = filtered.Where(s => s.Id == session.SubjectId);
-                }
-            }
-
-            if (FilterMember != "All")
-            {
-                // Subjects where Member attended any session
-                var attendedSessionIds = DataService.Instance.Attendances
-                    .Where(a => a.UserId == FilterMember)
-                    .Select(a => a.SessionId)
-                    .ToList();
-                
-                var subjectIds = DataService.Instance.Sessions
-                    .Where(s => attendedSessionIds.Contains(s.Id))
-                    .Select(s => s.SubjectId)
-                    .Distinct();
-
-                filtered = filtered.Where(s => subjectIds.Contains(s.Id));
+                                             s.Description?.ToLower().Contains(SearchText.ToLower()) == true);
             }
 
             Subjects = new ObservableCollection<Subject>(filtered.ToList());
@@ -165,32 +133,86 @@ namespace SportsClubManagement.ViewModels
 
         private bool CanAddSubject(object obj)
         {
-            return !string.IsNullOrWhiteSpace(NewSubjectName);
+            return IsFounderOrCoach && !string.IsNullOrWhiteSpace(NewSubjectName);
         }
 
         private void AddSubject(object obj)
         {
-            var newSub = new Subject
+            if (IsEditing && _editingSubject != null)
             {
-                TeamId = _team.Id,
-                Name = NewSubjectName,
-                Description = NewSubjectDesc
-            };
-            DataService.Instance.Subjects.Add(newSub);
-            DataService.Instance.Save();
+                // Update
+                _editingSubject.Name = NewSubjectName;
+                _editingSubject.Description = NewSubjectDesc;
+                
+                // Also update in DataService (reference is same, so just Save)
+                var dsSubject = DataService.Instance.Subjects.FirstOrDefault(s => s.Id == _editingSubject.Id);
+                if (dsSubject != null)
+                {
+                    dsSubject.Name = NewSubjectName;
+                    dsSubject.Description = NewSubjectDesc;
+                }
+                
+                DataService.Instance.Save();
+                
+                IsEditing = false;
+                _editingSubject = null;
+            }
+            else
+            {
+                // Add New
+                var newSub = new Subject
+                {
+                    TeamId = _team.Id,
+                    Name = NewSubjectName,
+                    Description = NewSubjectDesc,
+                    UserId = DataService.Instance.CurrentUser.Id,
+                    CreatedDate = DateTime.Now
+                };
+                DataService.Instance.Subjects.Add(newSub);
+                DataService.Instance.Save();
+            }
             
             NewSubjectName = string.Empty;
             NewSubjectDesc = string.Empty;
             LoadSubjects();
         }
 
+        private bool CanEditSubject(object obj) => IsFounderOrCoach;
+
+        private void EditSubject(object obj)
+        {
+            if (obj is Subject s)
+            {
+                _editingSubject = s;
+                NewSubjectName = s.Name;
+                NewSubjectDesc = s.Description;
+                IsEditing = true;
+            }
+        }
+
+        private void CancelEdit(object obj)
+        {
+            IsEditing = false;
+            _editingSubject = null;
+            NewSubjectName = string.Empty;
+            NewSubjectDesc = string.Empty;
+        }
+
+        private bool CanRemoveSubject(object obj) => IsFounderOrCoach;
+
         private void RemoveSubject(object parameter)
         {
             if (parameter is Subject sub)
             {
-                DataService.Instance.Subjects.Remove(sub);
-                DataService.Instance.Save();
-                LoadSubjects();
+                var result = System.Windows.MessageBox.Show($"Bạn có chắc chắn muốn xóa môn tập '{sub.Name}'?", "Xác nhận", 
+                    System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question);
+                
+                if (result == System.Windows.MessageBoxResult.Yes)
+                {
+                    DataService.Instance.Subjects.Remove(sub);
+                    DataService.Instance.Save();
+                    LoadSubjects();
+                }
             }
         }
     }

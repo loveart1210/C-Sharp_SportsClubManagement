@@ -16,22 +16,12 @@ namespace SportsClubManagement.ViewModels
         private DateTime _selectedDate;
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<AttendanceRecord> _attendanceRecords;
-        private string _message;
+        private string _attendanceSummary;
 
         public Team Team
         {
             get => _team;
             set => SetProperty(ref _team, value);
-        }
-
-        public Session SelectedSession
-        {
-            get => _selectedSession;
-            set
-            {
-                SetProperty(ref _selectedSession, value);
-                LoadAttendance();
-            }
         }
 
         public DateTime SelectedDate
@@ -50,30 +40,53 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _sessions, value);
         }
 
+        public Session SelectedSession
+        {
+            get => _selectedSession;
+            set
+            {
+                SetProperty(ref _selectedSession, value);
+                LoadAttendance();
+            }
+        }
+
         public ObservableCollection<AttendanceRecord> AttendanceRecords
         {
             get => _attendanceRecords;
             set => SetProperty(ref _attendanceRecords, value);
         }
 
-        public string Message
+        public string HeaderText => SelectedSession != null ? $"Điểm danh: {SelectedSession.Name}" : "Vui lòng chọn buổi tập";
+
+        public string AttendanceSummary
         {
-            get => _message;
-            set => SetProperty(ref _message, value);
+            get => _attendanceSummary;
+            set => SetProperty(ref _attendanceSummary, value);
+        }
+
+        public bool IsFounderOrCoach
+        {
+            get
+            {
+                if (_team == null) return false;
+                var currentUser = DataService.Instance.CurrentUser;
+                if (currentUser == null) return false;
+                
+                var member = DataService.Instance.TeamMembers
+                    .FirstOrDefault(tm => tm.TeamId == _team.Id && tm.UserId == currentUser.Id);
+                
+                return member != null && (member.Role == "Founder" || member.Role == "Coach");
+            }
         }
 
         public ICommand SaveAttendanceCommand { get; }
-        public ICommand MarkAllPresentCommand { get; }
-        public ICommand MarkAllAbsentCommand { get; }
 
         public AttendanceViewModel(Team team = null)
         {
             _team = team;
-            _selectedDate = DateTime.Now;
+            _selectedDate = DateTime.Today;
             
-            SaveAttendanceCommand = new RelayCommand(SaveAttendance);
-            MarkAllPresentCommand = new RelayCommand(o => MarkAll(true));
-            MarkAllAbsentCommand = new RelayCommand(o => MarkAll(false));
+            SaveAttendanceCommand = new RelayCommand(SaveAttendance, CanSaveAttendance);
 
             if (_team != null)
             {
@@ -83,12 +96,22 @@ namespace SportsClubManagement.ViewModels
 
         private void LoadSessions()
         {
+            if (_team == null) return;
             var sessions = DataService.Instance.Sessions
                 .Where(s => s.TeamId == _team.Id && s.StartTime.Date == _selectedDate.Date)
+                .OrderBy(s => s.StartTime)
                 .ToList();
             
+            // System.Windows.MessageBox.Show($"Debug LoadSessions:\nDate: {_selectedDate}\nTeamId: {_team.Id}\nFound: {sessions.Count}\nTotal DS Sessions: {DataService.Instance.Sessions.Count}");
+
+            
             Sessions = new ObservableCollection<Session>(sessions);
-            Message = sessions.Count == 0 ? "Không có buổi tập nào trong ngày này" : "";
+            SelectedSession = sessions.FirstOrDefault();
+        }
+
+        public void RefreshData()
+        {
+            LoadSessions();
         }
 
         private void LoadAttendance()
@@ -96,108 +119,103 @@ namespace SportsClubManagement.ViewModels
             if (_selectedSession == null)
             {
                 AttendanceRecords = new ObservableCollection<AttendanceRecord>();
+                AttendanceSummary = "";
+                OnPropertyChanged(nameof(HeaderText));
                 return;
             }
 
-            var records = new ObservableCollection<AttendanceRecord>();
-            var teamMembers = DataService.Instance.TeamMembers
-                .Where(tm => tm.TeamId == _team.Id)
+            OnPropertyChanged(nameof(HeaderText));
+
+            // Logic: Load Attendance records for this session.
+            // These records delineate WHO is participating.
+            var attendances = DataService.Instance.Attendances
+                .Where(a => a.SessionId == _selectedSession.Id)
                 .ToList();
 
-            foreach (var member in teamMembers)
+            var records = new ObservableCollection<AttendanceRecord>();
+            int presentCount = 0;
+
+            foreach (var att in attendances)
             {
-                var user = DataService.Instance.Users.FirstOrDefault(u => u.Id == member.UserId);
+                var user = DataService.Instance.Users.FirstOrDefault(u => u.Id == att.UserId);
+                var memberRole = DataService.Instance.TeamMembers
+                         .FirstOrDefault(tm => tm.TeamId == _team.Id && tm.UserId == att.UserId)?.Role ?? "Member";
+
                 if (user != null)
                 {
-                    var attendance = DataService.Instance.Attendances
-                        .FirstOrDefault(a => a.SessionId == _selectedSession.Id && a.UserId == user.Id);
-
-                    var record = new AttendanceRecord
+                    records.Add(new AttendanceRecord
                     {
-                        AttendanceId = attendance?.Id ?? Guid.NewGuid().ToString(),
-                        SessionId = _selectedSession.Id,
+                        AttendanceId = att.Id,
+                        SessionId = att.SessionId,
                         UserId = user.Id,
                         UserName = user.FullName,
-                        IsPresent = attendance?.IsPresent ?? false,
-                        Note = attendance?.Note ?? ""
-                    };
-
-                    records.Add(record);
+                        Role = memberRole,
+                        IsPresent = att.IsPresent,
+                        Note = att.Note
+                    });
+                    if (att.IsPresent) presentCount++;
                 }
             }
 
             AttendanceRecords = records;
+            AttendanceSummary = $"{presentCount}/{records.Count} có mặt";
+            OnPropertyChanged(nameof(IsFounderOrCoach));
         }
+
+        private bool CanSaveAttendance(object obj) => IsFounderOrCoach;
 
         private void SaveAttendance(object obj)
         {
-            if (_selectedSession == null)
-            {
-                Message = "Vui lòng chọn buổi tập";
-                return;
-            }
+            if (_selectedSession == null) return;
 
             try
             {
                 foreach (var record in AttendanceRecords)
                 {
                     var existing = DataService.Instance.Attendances
-                        .FirstOrDefault(a => a.SessionId == record.SessionId && a.UserId == record.UserId);
+                        .FirstOrDefault(a => a.Id == record.AttendanceId);
 
                     if (existing != null)
                     {
                         existing.IsPresent = record.IsPresent;
                         existing.Note = record.Note;
                     }
-                    else
-                    {
-                        var newAttendance = new Attendance
-                        {
-                            Id = record.AttendanceId,
-                            SessionId = record.SessionId,
-                            UserId = record.UserId,
-                            IsPresent = record.IsPresent,
-                            Note = record.Note,
-                            RecordedDate = DateTime.Now
-                        };
-
-                        DataService.Instance.Attendances.Add(newAttendance);
-                    }
                 }
 
                 DataService.Instance.Save();
-                Message = "Lưu điểm danh thành công!";
+                System.Windows.MessageBox.Show("Lưu điểm danh thành công!", "Thông báo", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                
+                LoadAttendance(); // Update summary
             }
             catch (Exception ex)
             {
-                Message = $"Lỗi: {ex.Message}";
+                System.Windows.MessageBox.Show($"Lỗi: {ex.Message}", "Lỗi", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
-        }
-
-        private void MarkAll(bool isPresent)
-        {
-            if (AttendanceRecords == null || AttendanceRecords.Count == 0)
-            {
-                Message = "Không có thành viên để điểm danh";
-                return;
-            }
-
-            foreach (var record in AttendanceRecords)
-            {
-                record.IsPresent = isPresent;
-            }
-
-            Message = isPresent ? "Đã đánh dấu tất cả có mặt" : "Đã đánh dấu tất cả vắng mặt";
         }
     }
 
-    public class AttendanceRecord
+    public class AttendanceRecord : ViewModelBase
     {
         public string AttendanceId { get; set; }
         public string SessionId { get; set; }
         public string UserId { get; set; }
         public string UserName { get; set; }
-        public bool IsPresent { get; set; }
-        public string Note { get; set; }
+        public string Role { get; set; }
+        
+        private bool _isPresent;
+        public bool IsPresent 
+        { 
+            get => _isPresent;
+            set => SetProperty(ref _isPresent, value);
+        }
+        
+        private string _note;
+        public string Note 
+        { 
+            get => _note; 
+            set => SetProperty(ref _note, value);
+        }
     }
 }
