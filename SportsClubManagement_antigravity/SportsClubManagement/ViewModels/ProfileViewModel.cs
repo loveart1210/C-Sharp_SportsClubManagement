@@ -23,6 +23,15 @@ namespace SportsClubManagement.ViewModels
         private string _newPassword = string.Empty;
         private string _confirmPassword = string.Empty;
         private bool _isChangingPassword;
+        private bool _isReadOnly;
+
+        public bool IsReadOnly
+        {
+            get => _isReadOnly;
+            set => SetProperty(ref _isReadOnly, value);
+        }
+
+        public bool IsEditable => !IsReadOnly;
 
         public string Username
         {
@@ -89,17 +98,28 @@ namespace SportsClubManagement.ViewModels
         public ICommand ChangePasswordCommand { get; }
         public ICommand SelectAvatarCommand { get; }
 
-        public ProfileViewModel()
+        public ProfileViewModel(string? userId = null)
         {
-            _currentUser = DataService.Instance.CurrentUser;
+            if (string.IsNullOrEmpty(userId) || (DataService.Instance.CurrentUser != null && userId == DataService.Instance.CurrentUser.Id))
+            {
+                _currentUser = DataService.Instance.CurrentUser;
+                IsReadOnly = false;
+            }
+            else
+            {
+                _currentUser = DataService.Instance.Users.FirstOrDefault(u => u.Id == userId);
+                IsReadOnly = true;
+            }
+
             if (_currentUser != null)
             {
                 LoadUserData();
             }
-            SaveCommand = new RelayCommand(SaveProfile);
-            CancelCommand = new RelayCommand(o => LoadUserData());
-            ChangePasswordCommand = new RelayCommand(ChangePassword, CanChangePassword);
-            SelectAvatarCommand = new RelayCommand(SelectAvatar);
+
+            SaveCommand = new RelayCommand(SaveProfile, o => !IsReadOnly);
+            CancelCommand = new RelayCommand(o => LoadUserData(), o => !IsReadOnly);
+            ChangePasswordCommand = new RelayCommand(ChangePassword, o => !IsReadOnly && CanChangePassword(o));
+            SelectAvatarCommand = new RelayCommand(SelectAvatar, o => !IsReadOnly);
         }
 
         private void LoadUserData()

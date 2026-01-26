@@ -21,6 +21,13 @@ namespace SportsClubManagement.ViewModels
         private ObservableCollection<string> _roles = new ObservableCollection<string> { "All", "Founder", "Admin", "Coach", "Member" };
         private ObservableCollection<Subject> _availableSubjects = new ObservableCollection<Subject>();
         private ObservableCollection<Session> _availableSessions = new ObservableCollection<Session>();
+        private bool _isFounder;
+
+        public bool IsFounder
+        {
+            get => _isFounder;
+            set => SetProperty(ref _isFounder, value);
+        }
 
         public ObservableCollection<string> Roles => _roles;
 
@@ -82,17 +89,25 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
-        public ICommand RemoveMemberCommand { get; }
-        public ICommand AddMemberCommand { get; }
+        public ICommand ViewProfileCommand { get; }
+
+        public event EventHandler<string>? OnRequestProfile;
 
         public TeamMembersViewModel(Team? team = null)
         {
             _team = team;
-            RemoveMemberCommand = new RelayCommand(RemoveMember);
-            AddMemberCommand = new RelayCommand(AddMember);
+            ViewProfileCommand = new RelayCommand(ViewProfile);
             if (_team != null)
             {
                 LoadMembers();
+            }
+        }
+
+        private void ViewProfile(object? parameter)
+        {
+            if (parameter is MemberDisplay member)
+            {
+                OnRequestProfile?.Invoke(this, member.UserId);
             }
         }
 
@@ -101,6 +116,8 @@ namespace SportsClubManagement.ViewModels
             if (_team == null) return;
 
             _allMembers = new ObservableCollection<MemberDisplay>();
+            var currentUser = DataService.Instance.CurrentUser;
+            
             foreach (var tm in DataService.Instance.TeamMembers.Where(x => x.TeamId == _team.Id))
             {
                 var user = DataService.Instance.Users.FirstOrDefault(u => u.Id == tm.UserId);
@@ -112,8 +129,15 @@ namespace SportsClubManagement.ViewModels
                         FullName = user.FullName,
                         Email = user.Email,
                         Role = tm.Role,
-                        AvatarPath = user.AvatarPath ?? ""
+                        AvatarPath = user.AvatarPath ?? "",
+                        JoinDate = tm.JoinDate
                     });
+
+                    // Check if current user is founder
+                    if (currentUser != null && user.Id == currentUser.Id && tm.Role == "Founder")
+                    {
+                        IsFounder = true;
+                    }
                 }
             }
             ApplyFilters();
@@ -178,25 +202,6 @@ namespace SportsClubManagement.ViewModels
 
             Members = new ObservableCollection<MemberDisplay>(filtered.ToList());
         }
-
-        private void RemoveMember(object? parameter)
-        {
-            if (parameter is MemberDisplay member && _team != null)
-            {
-                var tm = DataService.Instance.TeamMembers.FirstOrDefault(x => x.TeamId == _team.Id && x.UserId == member.UserId);
-                if (tm != null)
-                {
-                    DataService.Instance.TeamMembers.Remove(tm);
-                    DataService.Instance.Save();
-                    LoadMembers();
-                }
-            }
-        }
-
-        private void AddMember(object? obj)
-        {
-            // Mock - needs dialog in real app
-        }
     }
 
     public class MemberDisplay
@@ -206,5 +211,6 @@ namespace SportsClubManagement.ViewModels
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = "Member";
         public string AvatarPath { get; set; } = string.Empty;
+        public DateTime JoinDate { get; set; }
     }
 }

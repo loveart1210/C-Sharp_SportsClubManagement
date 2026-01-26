@@ -20,6 +20,7 @@ namespace SportsClubManagement.ViewModels
         public TeamSubjectsViewModel? SubjectsVM { get; private set; }
         public TeamSessionsViewModel? SessionsVM { get; private set; }
         public AttendanceViewModel? AttendanceVM { get; private set; }
+        public TeamMembersViewModel? MembersVM { get; private set; }
 
         public Team? Team
         {
@@ -59,6 +60,7 @@ namespace SportsClubManagement.ViewModels
         public ICommand BackCommand { get; }
 
         public event EventHandler? OnBack;
+        public event EventHandler<string>? OnRequestProfile;
 
         public void RefreshCurrentTab()
         {
@@ -99,10 +101,14 @@ namespace SportsClubManagement.ViewModels
                 SubjectsVM = new TeamSubjectsViewModel(_team);
                 SessionsVM = new TeamSessionsViewModel(_team);
                 AttendanceVM = new AttendanceViewModel(_team);
+                MembersVM = new TeamMembersViewModel(_team);
+                
+                MembersVM.OnRequestProfile += (s, userId) => OnRequestProfile?.Invoke(this, userId);
                 
                 OnPropertyChanged(nameof(SubjectsVM));
                 OnPropertyChanged(nameof(SessionsVM));
                 OnPropertyChanged(nameof(AttendanceVM));
+                OnPropertyChanged(nameof(MembersVM));
             }
         }
 

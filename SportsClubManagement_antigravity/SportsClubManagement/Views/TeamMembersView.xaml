@@ -3,40 +3,92 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:SportsClubManagement.Converters"
              mc:Ignorable="d" 
+             x:Name="TeamMembersRoot"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <UserControl.Resources>
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        
+        <Style x:Key="WatermarkTextBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Margin="5,0"/>
+                                <TextBlock Text="{TemplateBinding Tag}" 
+                                           Foreground="Gray" Margin="10,0,0,0" VerticalAlignment="Center"
+                                           IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <TextBox Width="200" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Padding="5" Tag="Search members..."/>
-            <!-- Placeholder for watermark -->
-            <!-- Filters -->
-            <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding FilterRole}" Width="100" Margin="10,0,0,0" ToolTip="Filter by Role"/>
-            <ComboBox ItemsSource="{Binding AvailableSubjects}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding FilterSubject}" Width="150" Margin="10,0,0,0" ToolTip="Filter by Subject"/>
-            <ComboBox ItemsSource="{Binding AvailableSessions}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding FilterSession}" Width="150" Margin="10,0,0,0" ToolTip="Filter by Session"/>
-            
-            <Button Content="Add Member" Command="{Binding AddMemberCommand}" Margin="10,0,0,0" Padding="10,5"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+            <TextBox Width="250" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="8,6" Tag="Tìm kiếm thành viên..." 
+                     Style="{StaticResource WatermarkTextBoxStyle}"
+                     BorderBrush="#E0E0E0" BorderThickness="1"/>
         </StackPanel>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Members}" AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-                <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="100"/>
-                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="150"/>
-                <DataGridTextColumn Header="Joined" Binding="{Binding JoinDate}" Width="100"/>
-                <DataGridTemplateColumn Header="Actions" Width="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Remove" Command="{Binding DataContext.RemoveMemberCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                    CommandParameter="{Binding}" Background="#FFD4D4"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <ListBox Grid.Row="1" ItemsSource="{Binding Members}" BorderBrush="#DDD" HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding FullName}" FontWeight="Bold" FontSize="14"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="{Binding Role}" Foreground="#1976D2" FontWeight="SemiBold"/>
+                                <TextBlock Text=" • " Foreground="Gray"/>
+                                <TextBlock Text="{Binding Email}" Foreground="Gray"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding JoinDate, StringFormat='Ngày tham gia: {0:dd/MM/yyyy}'}" FontSize="12" Foreground="Gray"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="👤 Xem profile" 
+                                    Command="{Binding DataContext.ViewProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" Padding="12,8"
+                                    Background="#2196F3" Foreground="White" BorderThickness="0" Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </UserControl>
