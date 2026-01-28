@@ -10,7 +10,7 @@ namespace SportsClubManagement.ViewModels
 {
     public class TeamFundsViewModel : ViewModelBase
     {
-        private Team? _team;
+        private readonly Team _team;
         private ObservableCollection<FundTransaction> _transactions = new ObservableCollection<FundTransaction>();
         private decimal _totalBalance;
         private decimal _amount;
@@ -47,108 +47,122 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _isDeposit, value);
         }
 
+        public bool IsFounder => DataService.Instance.CurrentUser != null && 
+                               DataService.Instance.TeamMembers.Any(tm => tm.TeamId == _team.Id && 
+                                                                        tm.UserId == DataService.Instance.CurrentUser.Id && 
+                                                                        tm.Role == "Founder");
+
         public ICommand DepositCommand { get; }
         public ICommand WithdrawCommand { get; }
         public ICommand ExportCommand { get; }
 
-        public TeamFundsViewModel(Team? team = null)
+        public TeamFundsViewModel(Team team)
         {
             _team = team;
-            if (_team != null)
-            {
-                LoadFundData();
-            }
-            DepositCommand = new RelayCommand(Deposit, CanTransaction);
-            WithdrawCommand = new RelayCommand(Withdraw, CanTransaction);
-            ExportCommand = new RelayCommand(Export);
+            DepositCommand = new RelayCommand(_ => Deposit(), _ => CanTransaction());
+            WithdrawCommand = new RelayCommand(_ => Withdraw(), _ => CanTransaction());
+            ExportCommand = new RelayCommand(_ => Export(), _ => IsFounder);
+            
+            RefreshData();
         }
 
-        private void LoadFundData()
+        public void RefreshData()
         {
-            if (_team == null) return;
             var transactions = DataService.Instance.Transactions
                 .Where(t => t.TeamId == _team.Id)
+                .OrderByDescending(t => t.Date)
                 .ToList();
             
             Transactions = new ObservableCollection<FundTransaction>(transactions);
             TotalBalance = _team.Balance;
         }
 
-        private bool CanTransaction(object? parameter)
+        private bool CanTransaction()
         {
-            return Amount > 0 && !string.IsNullOrWhiteSpace(Description);
+            return IsFounder && Amount > 0 && !string.IsNullOrWhiteSpace(Description);
         }
 
-        private void Deposit(object? obj)
+        private void Deposit()
         {
-            if (CanTransaction(obj) && _team != null)
+            var currentUser = DataService.Instance.CurrentUser;
+            if (currentUser == null) return;
+
+            var transaction = new FundTransaction
             {
-                var transaction = new FundTransaction
-                {
-                    TeamId = _team.Id,
-                    Amount = Amount,
-                    Description = Description,
-                    Type = "Deposit",
-                    ByUserId = DataService.Instance.CurrentUser?.Id ?? ""
-                };
-                
-                DataService.Instance.Transactions.Add(transaction);
-                _team.Balance += Amount;
-                DataService.Instance.Save();
-                
-                Transactions.Add(transaction);
-                TotalBalance = _team.Balance;
-                Amount = 0;
-                Description = "";
-            }
+                TeamId = _team.Id,
+                Amount = Amount,
+                Description = Description,
+                Type = "Deposit",
+                Date = DateTime.Now,
+                ByUserId = currentUser.Id
+            };
+            
+            DataService.Instance.Transactions.Add(transaction);
+            _team.Balance += Amount;
+            DataService.Instance.Save();
+            
+            Amount = 0;
+            Description = "";
+            RefreshData();
         }
 
-        private void Withdraw(object? obj)
+        private void Withdraw()
         {
-            if (CanTransaction(obj) && _team != null)
+            var currentUser = DataService.Instance.CurrentUser;
+            if (currentUser == null) return;
+
+            if (_team.Balance < Amount)
             {
-                if (_team.Balance >= Amount)
-                {
-                    var transaction = new FundTransaction
-                    {
-                        TeamId = _team.Id,
-                        Amount = -Amount,
-                        Description = Description,
-                        Type = "Withdraw",
-                        ByUserId = DataService.Instance.CurrentUser?.Id ?? ""
-                    };
-                    
-                    DataService.Instance.Transactions.Add(transaction);
-                    _team.Balance -= Amount;
-                    DataService.Instance.Save();
-                    
-                    Transactions.Add(transaction);
-                    TotalBalance = _team.Balance;
-                    Amount = 0;
-                    Description = "";
-                }
+                System.Windows.MessageBox.Show("Số dư không đủ để thực hiện giao dịch này.", "Lỗi", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                return;
             }
+
+            var transaction = new FundTransaction
+            {
+                TeamId = _team.Id,
+                Amount = -Amount,
+                Description = Description,
+                Type = "Withdraw",
+                Date = DateTime.Now,
+                ByUserId = currentUser.Id
+            };
+            
+            DataService.Instance.Transactions.Add(transaction);
+            _team.Balance -= Amount;
+            DataService.Instance.Save();
+            
+            Amount = 0;
+            Description = "";
+            RefreshData();
         }
 
-        private void Export(object? obj)
+        private void Export()
         {
-            if (_team != null)
+            try
             {
                 var filePath = ExportService.ExportFinancialReportToCSV(_team);
                 
-                // Create notification
+                // Automaticaly post notification
                 var notification = new Notification
                 {
                     TeamId = _team.Id,
                     ByUserId = DataService.Instance.CurrentUser?.Id ?? "",
-                    Title = "Xuất báo cáo tài chính",
-                    Content = $"Báo cáo tài chính đã được xuất tại: {filePath}"
+                    Title = "Báo cáo tài chính",
+                    Content = "Báo cáo tài chính đã được xuất",
+                    CreatedDate = DateTime.Now,
+                    IsSystemNotification = true
                 };
                 DataService.Instance.Notifications.Add(notification);
                 DataService.Instance.Save();
                 
-                System.Windows.MessageBox.Show($"Báo cáo đã được xuất tại:\n{filePath}", "Xuất thành công", 
+                System.Windows.MessageBox.Show($"Báo cáo tài chính đã được xuất tại:\n{filePath}", "Xuất thành công", 
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Lỗi khi xuất báo cáo: {ex.Message}", "Lỗi", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
     }

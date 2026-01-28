@@ -56,6 +56,12 @@ namespace SportsClubManagement.Data
                 .Property(t => t.Balance)
                 .HasPrecision(18, 2)
                 .HasDefaultValue(0);
+            modelBuilder.Entity<Team>()
+                .Property(t => t.JoinCode)
+                .HasMaxLength(20);
+            modelBuilder.Entity<Team>()
+                .HasIndex(t => t.JoinCode)
+                .IsUnique();
 
             // Configure TeamMember
             modelBuilder.Entity<TeamMember>()

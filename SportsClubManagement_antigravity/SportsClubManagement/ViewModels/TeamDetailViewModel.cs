@@ -13,7 +13,6 @@ namespace SportsClubManagement.ViewModels
     {
         private Team? _team;
         private ObservableCollection<TeamMember> _members = new ObservableCollection<TeamMember>();
-        private ObservableCollection<Notification> _notifications = new ObservableCollection<Notification>();
         private int _selectedTabIndex;
 
         // Child ViewModels
@@ -21,6 +20,9 @@ namespace SportsClubManagement.ViewModels
         public TeamSessionsViewModel? SessionsVM { get; private set; }
         public AttendanceViewModel? AttendanceVM { get; private set; }
         public TeamMembersViewModel? MembersVM { get; private set; }
+        public TeamSettingsViewModel? SettingsVM { get; private set; }
+        public TeamNotificationsViewModel? NotificationsVM { get; private set; }
+        public TeamFundsViewModel? FundsVM { get; private set; }
 
         public Team? Team
         {
@@ -39,11 +41,6 @@ namespace SportsClubManagement.ViewModels
             set => SetProperty(ref _members, value);
         }
 
-        public ObservableCollection<Notification> Notifications
-        {
-            get => _notifications;
-            set => SetProperty(ref _notifications, value);
-        }
 
         public int SelectedTabIndex
         {
@@ -80,6 +77,15 @@ namespace SportsClubManagement.ViewModels
                     }
                     AttendanceVM?.RefreshData(); 
                     break;
+                case 4: // Notifications tab
+                    NotificationsVM?.RefreshData();
+                    break;
+                case 5: // Funds tab
+                    FundsVM?.RefreshData();
+                    break;
+                case 6: // Settings tab
+                    SettingsVM?.RefreshData();
+                    break;
             }
         }
 
@@ -102,6 +108,9 @@ namespace SportsClubManagement.ViewModels
                 SessionsVM = new TeamSessionsViewModel(_team);
                 AttendanceVM = new AttendanceViewModel(_team);
                 MembersVM = new TeamMembersViewModel(_team);
+                SettingsVM = new TeamSettingsViewModel(_team);
+                NotificationsVM = new TeamNotificationsViewModel(_team);
+                FundsVM = new TeamFundsViewModel(_team);
                 
                 MembersVM.OnRequestProfile += (s, userId) => OnRequestProfile?.Invoke(this, userId);
                 
@@ -109,6 +118,9 @@ namespace SportsClubManagement.ViewModels
                 OnPropertyChanged(nameof(SessionsVM));
                 OnPropertyChanged(nameof(AttendanceVM));
                 OnPropertyChanged(nameof(MembersVM));
+                OnPropertyChanged(nameof(SettingsVM));
+                OnPropertyChanged(nameof(NotificationsVM));
+                OnPropertyChanged(nameof(FundsVM));
             }
         }
 
@@ -119,13 +131,6 @@ namespace SportsClubManagement.ViewModels
             // Load Members
             var members = DataService.Instance.TeamMembers.Where(tm => tm.TeamId == _team.Id).ToList();
             Members = new ObservableCollection<TeamMember>(members);
-
-            // Load Notifications
-            var notifs = DataService.Instance.Notifications
-                .Where(n => n.TeamId == _team.Id)
-                .OrderByDescending(n => n.CreatedDate)
-                .ToList();
-            Notifications = new ObservableCollection<Notification>(notifs);
         }
 
         private void GoBack(object? obj)

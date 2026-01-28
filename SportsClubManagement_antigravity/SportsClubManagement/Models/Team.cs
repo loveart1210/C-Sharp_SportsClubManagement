@@ -11,5 +11,6 @@ namespace SportsClubManagement.Models
         public string AvatarPath { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public decimal Balance { get; set; } = 0m;
+        public string JoinCode { get; set; } = string.Empty;
     }
 }

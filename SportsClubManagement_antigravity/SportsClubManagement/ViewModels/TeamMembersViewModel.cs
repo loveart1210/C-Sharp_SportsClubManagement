@@ -130,7 +130,8 @@ namespace SportsClubManagement.ViewModels
                         Email = user.Email,
                         Role = tm.Role,
                         AvatarPath = user.AvatarPath ?? "",
-                        JoinDate = tm.JoinDate
+                        JoinDate = tm.JoinDate,
+                        IsCurrentUser = user.Id == currentUser?.Id
                     });
 
                     // Check if current user is founder
@@ -212,5 +213,6 @@ namespace SportsClubManagement.ViewModels
         public string Role { get; set; } = "Member";
         public string AvatarPath { get; set; } = string.Empty;
         public DateTime JoinDate { get; set; }
+        public bool IsCurrentUser { get; set; }
     }
 }

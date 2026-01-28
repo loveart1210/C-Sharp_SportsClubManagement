@@ -1,0 +1,112 @@
+<UserControl x:Class="SportsClubManagement.Views.TeamNotificationsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:SportsClubManagement.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+
+        <Style x:Key="NotificationBorder" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#2196F3"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300" x:Name="RightPanelCol"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Notification List -->
+        <DockPanel Grid.Column="0" Margin="0,0,20,0">
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,15">
+                <TextBlock Text="Thông báo &amp; Bài viết" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Button Content="🔄 Tải lại" HorizontalAlignment="Right" Command="{Binding RefreshCommand}" 
+                        Padding="10,5" Cursor="Hand" Background="Transparent" BorderBrush="#DDD"/>
+            </Grid>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Notifications}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource NotificationBorder}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Notification.Title}" FontSize="16" FontWeight="Bold" Foreground="#1976D2"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2,0,8">
+                                            <TextBlock Text="{Binding AuthorName}" FontSize="12" FontWeight="SemiBold" Foreground="#555" Margin="0,0,10,0"/>
+                                            <TextBlock Text="{Binding Notification.CreatedDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" 
+                                                      FontSize="12" Foreground="#888"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Notification.Content}" TextWrapping="Wrap" LineHeight="20" Foreground="#333"/>
+                                    </StackPanel>
+
+                                    <Button Grid.Column="1" Content="🗑️" VerticalAlignment="Top" 
+                                            Command="{Binding DataContext.DeleteNotificationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                            Visibility="{Binding IsDeletable, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            ToolTip="Xóa thông báo" Margin="5,0,0,0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+
+        <!-- Right Panel: Add Notification -->
+        <Border Grid.Column="1" Background="#F5F7FA" CornerRadius="8" Padding="20" VerticalAlignment="Top">
+            <StackPanel>
+                <StackPanel Visibility="{Binding CanManageNotifications, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Đăng thông báo mới" FontSize="16" FontWeight="Bold" Margin="0,0,0,15"/>
+                    
+                    <TextBlock Text="Tiêu đề" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding NewNotificationTitle, UpdateSourceTrigger=PropertyChanged}" 
+                             Padding="8" Margin="0,0,0,15" Background="White"/>
+                    
+                    <TextBlock Text="Nội dung" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding NewNotificationContent, UpdateSourceTrigger=PropertyChanged}" 
+                             Padding="8" Margin="0,0,0,20" Height="150" AcceptsReturn="True" TextWrapping="Wrap" Background="White" VerticalContentAlignment="Top"/>
+                    
+                    <Button Content="Đăng thông báo" Command="{Binding AddNotificationCommand}" 
+                            Padding="15,10" FontWeight="Bold" Background="#4CAF50" Foreground="White" BorderThickness="0" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding CanManageNotifications, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                    <TextBlock Text="ℹ️ Chỉ Quản trị viên và Người sáng lập mới có thể đăng thông báo." 
+                               Foreground="#666" TextWrapping="Wrap" TextAlignment="Center" Margin="0,20"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

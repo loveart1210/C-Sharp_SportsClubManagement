@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "SportsClubManagement/1.0.0": {
         "dependencies": {
+          "Microsoft.EntityFrameworkCore": "8.0.0",
           "Microsoft.Extensions.Caching.Memory": "8.0.1",
           "Pomelo.EntityFrameworkCore.MySql": "8.0.0"
         },

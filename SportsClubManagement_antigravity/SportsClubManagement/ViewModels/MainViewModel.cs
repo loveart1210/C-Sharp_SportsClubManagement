@@ -65,7 +65,11 @@ namespace SportsClubManagement.ViewModels
                 }
                 CurrentView = vm;
             });
-            NavigateToProfileCommand = new RelayCommand(o => CurrentView = new ProfileViewModel());
+            NavigateToProfileCommand = new RelayCommand(o => {
+                var profileWindow = new ProfileWindow(DataService.Instance.CurrentUser?.Id ?? "");
+                profileWindow.Owner = Application.Current.MainWindow;
+                profileWindow.ShowDialog();
+            });
             NavigateToAdminCommand = new RelayCommand(o => CurrentView = new UserManagementViewModel());
             LogoutCommand = new RelayCommand(ExecuteLogout);
 
@@ -102,7 +106,11 @@ namespace SportsClubManagement.ViewModels
             {
                 var detailVM = new TeamDetailViewModel(team);
                 detailVM.OnBack += (s2, e2) => ShowTeamsView();
-                detailVM.OnRequestProfile += (s2, userId) => CurrentView = new ProfileViewModel(userId);
+                detailVM.OnRequestProfile += (s2, userId) => {
+                    var profileWindow = new ProfileWindow(userId);
+                    profileWindow.Owner = Application.Current.MainWindow;
+                    profileWindow.ShowDialog();
+                };
                 CurrentView = detailVM;
             };
             CurrentView = teamsVM;

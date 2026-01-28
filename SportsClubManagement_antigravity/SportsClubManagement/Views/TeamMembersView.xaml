@@ -8,7 +8,8 @@
              x:Name="TeamMembersRoot"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <conv:BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         
         <Style x:Key="WatermarkTextBoxStyle" TargetType="{x:Type TextBox}">
             <Setter Property="Template">
@@ -48,45 +49,58 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-            <TextBox Width="250" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     Padding="8,6" Tag="Tìm kiếm thành viên..." 
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,15,20,15">
+            <TextBox Width="300" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="10,8" Tag="Tìm kiếm thành viên..." 
                      Style="{StaticResource WatermarkTextBoxStyle}"
                      BorderBrush="#E0E0E0" BorderThickness="1"/>
         </StackPanel>
 
-        <ListBox Grid.Row="1" ItemsSource="{Binding Members}" BorderBrush="#DDD" HorizontalContentAlignment="Stretch">
+        <ListBox Grid.Row="1" ItemsSource="{Binding Members}" BorderThickness="0" HorizontalContentAlignment="Stretch" Margin="10,0">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <TextBlock Text="{Binding FullName}" FontWeight="Bold" FontSize="14"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock Text="{Binding Role}" Foreground="#1976D2" FontWeight="SemiBold"/>
-                                <TextBlock Text=" • " Foreground="Gray"/>
-                                <TextBlock Text="{Binding Email}" Foreground="Gray"/>
+                    <Border BorderBrush="#EEEEEE" BorderThickness="0,0,0,1" Padding="10,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding FullName}" FontWeight="Bold" FontSize="15"/>
+                                    <Border Background="#E3F2FD" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Role}" FontSize="11" Foreground="#1976D2" FontWeight="SemiBold"/>
+                                    </Border>
+                                    <TextBlock Text="(Bạn)" FontSize="12" Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" 
+                                               Visibility="{Binding IsCurrentUser, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding Email}" Foreground="Gray" FontSize="13" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding JoinDate, StringFormat='Tham gia: {0:dd/MM/yyyy}'}" Foreground="#999" FontSize="11" Margin="0,3,0,0"/>
                             </StackPanel>
-                            <TextBlock Text="{Binding JoinDate, StringFormat='Ngày tham gia: {0:dd/MM/yyyy}'}" FontSize="12" Foreground="Gray"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button Content="👤 Xem profile" 
-                                    Command="{Binding DataContext.ViewProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}" Padding="12,8"
-                                    Background="#2196F3" Foreground="White" BorderThickness="0" Cursor="Hand">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="👤 Xem Profile" 
+                                        Command="{Binding DataContext.ViewProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Visibility="{Binding IsCurrentUser, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                        Padding="12,8" Background="White" BorderBrush="#2196F3" Foreground="#2196F3" 
+                                        FontWeight="SemiBold" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" 
+                                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                                    BorderThickness="1" 
+                                                    CornerRadius="4" 
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

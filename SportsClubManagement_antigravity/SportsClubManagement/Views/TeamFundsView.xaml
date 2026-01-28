@@ -3,58 +3,213 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:SportsClubManagement.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             d:DesignHeight="600" d:DesignWidth="900">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+        
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#1976D2"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+
+        <Style x:Key="CardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- Balance info -->
+            <RowDefinition Height="Auto"/> <!-- Actions for Founder -->
+            <RowDefinition Height="*"/>    <!-- History -->
         </Grid.RowDefinitions>
 
-        <!-- Balance Info -->
-        <Border Background="#4CAF50" Padding="20" Margin="0,0,0,20" CornerRadius="5">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="Total Balance:" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,10,0"/>
-                <TextBlock Text="{Binding TotalBalance, StringFormat={}{0:N0} VND}" Foreground="White" FontSize="20"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Transaction Form -->
-        <Border Grid.Row="1" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Padding="15" Margin="0,0,0,20">
+        <!-- Balance Section -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,20" Background="#E3F2FD">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
-                <StackPanel Orientation="Horizontal" Grid.Column="0">
-                    <RadioButton Content="Deposit" IsChecked="{Binding IsDeposit}" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                    <RadioButton Content="Withdraw" IsChecked="{Binding IsDeposit, Converter={StaticResource InverseBoolConverter}}" VerticalAlignment="Center"/> 
-                    <!-- Note: Converter not implemented yet, simple toggle logic might be better via property or just using IsDeposit=False via RB Group -->
-                    <!-- Re-impl simplified: Two RBs binding to same bool? WPF needs ValueConverter usually. Let's rely on View logic or simple UI for now. -->
+                <StackPanel>
+                    <TextBlock Text="SỐ DƯ QUỸ NHÓM" FontSize="14" FontWeight="SemiBold" Foreground="#1565C0"/>
+                    <TextBlock Text="{Binding TotalBalance, StringFormat={}{0:N0} VNĐ}" FontSize="32" FontWeight="Bold" Foreground="#1976D2" Margin="0,5,0,0"/>
                 </StackPanel>
-                
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="Amount:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                    <TextBox Text="{Binding Amount}" Width="100" Margin="0,0,15,0" Padding="3"/>
-                    
-                    <TextBlock Text="Description:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                    <TextBox Text="{Binding Description}" Width="200" Margin="0,0,15,0" Padding="3"/>
-                </StackPanel>
-                
-                <Button Grid.Column="2" Content="Submit Transaction" Command="{Binding SubmitTransactionCommand}" Padding="15,5"/>
+
+                <Button Grid.Column="1" Content="📄 Xuất báo cáo (CSV)" Command="{Binding ExportCommand}"
+                        Visibility="{Binding IsFounder, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Padding="15,10" FontWeight="Bold" Background="White" BorderBrush="#1976D2" BorderThickness="1" Foreground="#1976D2" Cursor="Hand"/>
             </Grid>
         </Border>
 
-        <!-- History -->
-        <DataGrid Grid.Row="2" ItemsSource="{Binding Transactions}" AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="150"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat={}{0:N0}}" Width="100" FontWeight="Bold"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <!-- Actions Section (Founder Only) -->
+        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,20"
+                Visibility="{Binding IsFounder, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Text="Nạp / Rút Quỹ" Style="{StaticResource HeaderTextStyle}"/>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Type Selection -->
+                    <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                        <TextBlock Text="Loại giao dịch" FontSize="12" Foreground="#666" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="40">
+                            <RadioButton Content="Nạp quỹ" IsChecked="{Binding IsDeposit}" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <RadioButton Content="Rút quỹ" IsChecked="{Binding IsDeposit, Converter={StaticResource InverseBooleanToVisibilityConverter}}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Amount -->
+                    <StackPanel Grid.Column="1" Margin="0,0,20,0">
+                        <TextBlock Text="Số tiền (VNĐ)" FontSize="12" Foreground="#666" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" Padding="8" Height="40" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Description -->
+                    <StackPanel Grid.Column="2" Margin="0,0,20,0">
+                        <TextBlock Text="Nguồn / Lý do" FontSize="12" Foreground="#666" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Padding="8" Height="40" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Submit -->
+                    <StackPanel Grid.Column="3" VerticalAlignment="Bottom">
+                        <Button Content="Thực hiện giao dịch" 
+                                Command="{Binding IsDeposit, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=CommandMapping}"
+                                Padding="20,0" Height="40" FontWeight="Bold">
+                            <!-- Complex binding for command based on IsDeposit might be overkill, let's simplify ViewModel and use one command or specific buttons -->
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="#1976D2"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsDeposit}" Value="True">
+                                            <Setter Property="Command" Value="{Binding DepositCommand}"/>
+                                            <Setter Property="Content" Value="➕ Nạp quỹ"/>
+                                            <Setter Property="Background" Value="#4CAF50"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsDeposit}" Value="False">
+                                            <Setter Property="Command" Value="{Binding WithdrawCommand}"/>
+                                            <Setter Property="Content" Value="➖ Rút quỹ"/>
+                                            <Setter Property="Background" Value="#F44336"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- History Section -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Lịch sử giao dịch" Style="{StaticResource HeaderTextStyle}"/>
+                
+                <DataGrid ItemsSource="{Binding Transactions}" AutoGenerateColumns="False" 
+                          IsReadOnly="True" BorderThickness="0" Background="White"
+                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F0F0F0"
+                          RowHeight="45">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F5F7FA"/>
+                            <Setter Property="Foreground" Value="#666"/>
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                        </Style>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="10,0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#E3F2FD"/>
+                                    <Setter Property="Foreground" Value="#1976D2"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Ngày" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="150"/>
+                        <DataGridTemplateColumn Header="Loại" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="4" Padding="8,3" HorizontalAlignment="Left">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Deposit">
+                                                        <Setter Property="Background" Value="#E8F5E9"/>
+                                                        <Setter Property="Tag" Value="#2E7D32"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Withdraw">
+                                                        <Setter Property="Background" Value="#FFEBEE"/>
+                                                        <Setter Property="Tag" Value="#C62828"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding Type}" Foreground="{Binding Tag, RelativeSource={RelativeSource AncestorType=Border}}" FontWeight="SemiBold" FontSize="11"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Số tiền" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontWeight="Bold" VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Deposit">
+                                                        <Setter Property="Text" Value="{Binding Amount, StringFormat={}{0:+N0}}"/>
+                                                        <Setter Property="Foreground" Value="#2E7D32"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Withdraw">
+                                                        <Setter Property="Text" Value="{Binding Amount, StringFormat={}{0:N0}}"/>
+                                                        <Setter Property="Foreground" Value="#C62828"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Nguồn / Lý do" Binding="{Binding Description}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Border>
     </Grid>
 </UserControl>

@@ -80,8 +80,10 @@ namespace SportsClubManagement.ViewModels
             var currentUser = DataService.Instance.CurrentUser;
             if (currentUser == null) return;
 
-            // Check if team exists
-            var team = DataService.Instance.Teams.FirstOrDefault(t => t.Id == JoinTeamCode || t.Id.StartsWith(JoinTeamCode));
+            // Check if team exists by JoinCode first, then fallback to ID prefix
+            var team = DataService.Instance.Teams.FirstOrDefault(t => 
+                t.JoinCode.Equals(JoinTeamCode, StringComparison.OrdinalIgnoreCase) || 
+                t.Id.StartsWith(JoinTeamCode));
             
             if (team == null)
             {

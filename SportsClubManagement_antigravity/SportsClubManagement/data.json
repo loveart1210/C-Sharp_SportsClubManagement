@@ -32,6 +32,17 @@
       "AvatarPath": null,
       "BirthDate": "2001-03-20T00:00:00",
       "CreatedDate": "2026-01-06T07:25:23.2977478+07:00"
+    },
+    {
+      "Id": "f2a31c5d-6e7f-48d9-a0b1-c2e3d4f5g6h7",
+      "Username": "testuser",
+      "Password": "password123",
+      "FullName": "Test User",
+      "Email": "testuser@sports.club",
+      "Role": "User",
+      "AvatarPath": null,
+      "BirthDate": "2000-01-01T00:00:00",
+      "CreatedDate": "2026-01-26T18:19:00+07:00"
     }
   ],
   "Teams": [
