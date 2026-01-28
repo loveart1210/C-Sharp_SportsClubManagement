@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         
         <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="18"/>
@@ -75,7 +76,7 @@
                         <TextBlock Text="Loại giao dịch" FontSize="12" Foreground="#666" Margin="0,0,0,5"/>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="40">
                             <RadioButton Content="Nạp quỹ" IsChecked="{Binding IsDeposit}" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                            <RadioButton Content="Rút quỹ" IsChecked="{Binding IsDeposit, Converter={StaticResource InverseBooleanToVisibilityConverter}}" VerticalAlignment="Center"/>
+                            <RadioButton Content="Rút quỹ" IsChecked="{Binding IsDeposit, Converter={StaticResource InverseBooleanConverter}}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
 
@@ -94,7 +95,7 @@
                     <!-- Submit -->
                     <StackPanel Grid.Column="3" VerticalAlignment="Bottom">
                         <Button Content="Thực hiện giao dịch" 
-                                Command="{Binding IsDeposit, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=CommandMapping}"
+                                ToolTip="Yêu cầu: Quyền Founder, Số tiền > 0 và phải nhập Nguồn / Lý do."
                                 Padding="20,0" Height="40" FontWeight="Bold">
                             <!-- Complex binding for command based on IsDeposit might be overkill, let's simplify ViewModel and use one command or specific buttons -->
                             <Button.Style>
@@ -192,11 +193,11 @@
                                             <Style TargetType="TextBlock">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Type}" Value="Deposit">
-                                                        <Setter Property="Text" Value="{Binding Amount, StringFormat={}{0:+N0}}"/>
+                                                        <Setter Property="Text" Value="{Binding Amount, StringFormat={}{0:+0}}"/>
                                                         <Setter Property="Foreground" Value="#2E7D32"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Type}" Value="Withdraw">
-                                                        <Setter Property="Text" Value="{Binding Amount, StringFormat={}{0:N0}}"/>
+                                                        <Setter Property="Text" Value="{Binding Amount, StringFormat={}{0:-0}}"/>
                                                         <Setter Property="Foreground" Value="#C62828"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>

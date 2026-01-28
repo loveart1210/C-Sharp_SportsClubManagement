@@ -150,3 +150,11 @@ E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManag
 E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\ProfileWindow.baml
 E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\TeamNotificationsView.g.cs
 E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\TeamNotificationsView.baml
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\ChangePasswordWindow.baml
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\ChangePasswordWindow.g.cs
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Themes\Styles.baml
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\App.baml
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\AdminPanelView.g.cs
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\AdminTeamManagementView.g.cs
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\AdminPanelView.baml
+E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\obj\Debug\net10.0-windows\Views\AdminTeamManagementView.baml

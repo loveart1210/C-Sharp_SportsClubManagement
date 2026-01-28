@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using SportsClubManagement.Models;
 using SportsClubManagement.Data;
+using SportsClubManagement.Helpers;
 
 namespace SportsClubManagement.Services
 {
@@ -43,10 +44,12 @@ namespace SportsClubManagement.Services
                 Load();
                 if (!Users.Any()) SeedData();
                 else { EnsureDemoUsers(); EnsureJoinCodes(); }
+                MigratePasswords();
             }
             else
             {
                 EnsureJoinCodes();
+                MigratePasswords(); // Migrate DB users too if they are loaded
             }
         }
 
@@ -285,7 +288,7 @@ namespace SportsClubManagement.Services
             var admin = new User
             {
                 Username = "admin",
-                Password = "admin123",
+                Password = PasswordHasher.Hash("admin123"),
                 FullName = "Admin System",
                 Role = "Admin",
                 Email = "admin@sports.club",
@@ -296,7 +299,7 @@ namespace SportsClubManagement.Services
             var user1 = new User
             {
                 Username = "user1",
-                Password = "user123",
+                Password = PasswordHasher.Hash("user123"),
                 FullName = "Nguyễn Văn A",
                 Role = "User",
                 Email = "user1@sports.club",
@@ -307,7 +310,7 @@ namespace SportsClubManagement.Services
             var user2 = new User
             {
                 Username = "user2",
-                Password = "user123",
+                Password = PasswordHasher.Hash("user123"),
                 FullName = "Trần Văn B",
                 Role = "User",
                 Email = "user2@sports.club",
@@ -383,7 +386,7 @@ namespace SportsClubManagement.Services
                 Users.Add(new User
                 {
                     Username = "admin",
-                    Password = "admin123",
+                    Password = PasswordHasher.Hash("admin123"),
                     FullName = "Admin System",
                     Role = "Admin",
                     Email = "admin@sports.club",
@@ -397,7 +400,7 @@ namespace SportsClubManagement.Services
                 Users.Add(new User
                 {
                     Username = "user1",
-                    Password = "user123",
+                    Password = PasswordHasher.Hash("user123"),
                     FullName = "Nguyễn Văn A",
                     Role = "User",
                     Email = "user1@sports.club",
@@ -411,7 +414,7 @@ namespace SportsClubManagement.Services
                 Users.Add(new User
                 {
                     Username = "user2",
-                    Password = "user123",
+                    Password = PasswordHasher.Hash("user123"),
                     FullName = "Trần Văn B",
                     Role = "User",
                     Email = "user2@sports.club",
@@ -459,6 +462,21 @@ namespace SportsClubManagement.Services
                 if (string.IsNullOrWhiteSpace(team.JoinCode))
                 {
                     team.JoinCode = GenerateJoinCode();
+                    changed = true;
+                }
+            }
+            if (changed) Save();
+        }
+
+        private void MigratePasswords()
+        {
+            bool changed = false;
+            foreach (var user in Users)
+            {
+                // SHA-256 hex hash is exactly 64 characters
+                if (user.Password.Length != 64)
+                {
+                    user.Password = PasswordHasher.Hash(user.Password);
                     changed = true;
                 }
             }

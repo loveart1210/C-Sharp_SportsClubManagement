@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -14,6 +15,8 @@ namespace SportsClubManagement.ViewModels
         private string _searchText = string.Empty;
         private string _filterRole = "All";
         private ObservableCollection<User> _allUsers = new ObservableCollection<User>();
+        private string _tempPassword = string.Empty;
+        private bool _showTempPassword = false;
 
         public ObservableCollection<User> Users
         {
@@ -41,8 +44,21 @@ namespace SportsClubManagement.ViewModels
             }
         }
 
+        public string TempPassword
+        {
+            get => _tempPassword;
+            set => SetProperty(ref _tempPassword, value);
+        }
+
+        public bool ShowTempPassword
+        {
+            get => _showTempPassword;
+            set => SetProperty(ref _showTempPassword, value);
+        }
+
         public ICommand ResetPasswordCommand { get; }
         public ICommand DeleteUserCommand { get; }
+        public ICommand CloseTempPasswordCommand { get; }
 
         public UserManagementViewModel()
         {
@@ -50,6 +66,7 @@ namespace SportsClubManagement.ViewModels
             LoadUsers();
             ResetPasswordCommand = new RelayCommand(ResetPassword);
             DeleteUserCommand = new RelayCommand(DeleteUser);
+            CloseTempPasswordCommand = new RelayCommand(_ => ShowTempPassword = false);
         }
 
         private void LoadUsers()
@@ -64,6 +81,7 @@ namespace SportsClubManagement.ViewModels
             
             if (!string.IsNullOrWhiteSpace(SearchText))
                 filtered = filtered.Where(u => u.FullName.ToLower().Contains(SearchText.ToLower()) || 
+                                             u.Username.ToLower().Contains(SearchText.ToLower()) ||
                                              u.Email.ToLower().Contains(SearchText.ToLower()));
             
             if (FilterRole != "All")
@@ -76,12 +94,20 @@ namespace SportsClubManagement.ViewModels
         {
             if (obj is User user)
             {
-                var result = MessageBox.Show($"Bạn có chắc muốn reset mật khẩu cho {user.FullName}?", "Xác nhận", MessageBoxButton.YesNo);
+                var result = MessageBox.Show($"Bạn có chắc muốn reset mật khẩu cho {user.FullName} ({user.Username})?", "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    user.Password = "123"; // Default password
+                    // Generate a 6-digit random password
+                    string plainPassword = new Random().Next(100000, 999999).ToString();
+                    
+                    // Hash and save
+                    user.Password = PasswordHasher.Hash(plainPassword);
+                    user.MustChangePassword = true;
                     DataService.Instance.Save();
-                    MessageBox.Show("Mật khẩu đã được reset thành công!");
+                    
+                    // Display to admin
+                    TempPassword = plainPassword;
+                    ShowTempPassword = true;
                 }
             }
         }
@@ -90,18 +116,17 @@ namespace SportsClubManagement.ViewModels
         {
             if (obj is User deleteUser && deleteUser.Id != DataService.Instance.CurrentUser?.Id)
             {
-                var result = MessageBox.Show($"Bạn có chắc muốn xóa người dùng {deleteUser.FullName}?", "Xác nhận", MessageBoxButton.YesNo);
+                var result = MessageBox.Show($"Bạn có chắc muốn xóa người dùng {deleteUser.FullName}?", "Xác nhận Xóa", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
                     DataService.Instance.Users.Remove(deleteUser);
                     DataService.Instance.Save();
                     LoadUsers();
-                    MessageBox.Show("Người dùng đã được xóa!");
                 }
             }
             else if (obj is User currentUser && currentUser.Id == DataService.Instance.CurrentUser?.Id)
             {
-                MessageBox.Show("Không thể xóa tài khoản của chính bạn!");
+                MessageBox.Show("Không thể tự xóa tài khoản của chính mình!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

@@ -21,51 +21,42 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="Lịch Tập Cá Nhân" FontSize="24" FontWeight="Bold" Foreground="#1976D2" VerticalAlignment="Center"/>
+        <DockPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="Lịch Tập Cá Nhân" FontSize="22" FontWeight="Bold" Foreground="#1976D2" VerticalAlignment="Center"/>
             
-            <!-- Filters (only visible/relevant for the second tab) -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="{Binding SelectedTabIndex, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=1}">
-                <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Trạng thái" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding FilterStatus}" Width="100" VerticalContentAlignment="Center"/>
+            <!-- Filters -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                        Visibility="{Binding SelectedTabIndex, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=1}">
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Trạng thái" FontSize="11" Foreground="#333" Margin="0,0,0,2"/>
+                    <ComboBox ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding FilterStatus}" Width="100" Height="30" VerticalContentAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Ngày" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding DayOptions}" SelectedItem="{Binding FilterDay}" Width="65" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="Ngày" FontSize="11" Foreground="#333" Margin="0,0,0,2"/>
+                    <ComboBox ItemsSource="{Binding DayOptions}" SelectedItem="{Binding FilterDay}" Width="60" Height="30" VerticalContentAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Tháng" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding FilterMonth}" Width="65" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="Tháng" FontSize="11" Foreground="#333" Margin="0,0,0,2"/>
+                    <ComboBox ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding FilterMonth}" Width="60" Height="30" VerticalContentAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Năm" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding YearOptions}" SelectedItem="{Binding FilterYear}" Width="80" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="Năm" FontSize="11" Foreground="#333" Margin="0,0,0,2"/>
+                    <ComboBox ItemsSource="{Binding YearOptions}" SelectedItem="{Binding FilterYear}" Width="75" Height="30" VerticalContentAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Buổi tập" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding SessionNameOptions}" SelectedItem="{Binding FilterSessionName}" Width="110" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="Môn" FontSize="11" Foreground="#333" Margin="0,0,0,2"/>
+                    <ComboBox ItemsSource="{Binding SubjectNameOptions}" SelectedItem="{Binding FilterSubjectName}" Width="100" Height="30" VerticalContentAlignment="Center"/>
                 </StackPanel>
-                <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Môn" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding SubjectNameOptions}" SelectedItem="{Binding FilterSubjectName}" Width="110" VerticalContentAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Bắt đầu" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding StartTimeOptions}" SelectedItem="{Binding FilterStartTime}" Width="80" VerticalContentAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Margin="5,0,0,0">
-                    <TextBlock Text="Kết thúc" FontSize="11" Foreground="Gray" Margin="2,0,0,2"/>
-                    <ComboBox ItemsSource="{Binding EndTimeOptions}" SelectedItem="{Binding FilterEndTime}" Width="80" VerticalContentAlignment="Center"/>
-                </StackPanel>
-                <Button Content="Clear" Command="{Binding ClearFiltersCommand}" Margin="10,0,0,0" Padding="10,5" VerticalAlignment="Bottom" Background="#9E9E9E" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                
+                <Button Content="Xóa lọc" Command="{Binding ClearFiltersCommand}" Margin="10,8,0,0" 
+                        Style="{StaticResource ModernButtonStyle}" Background="#9E9E9E" Foreground="White" Padding="12,4" VerticalAlignment="Center"/>
             </StackPanel>
         </DockPanel>
 
         <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}">
             <!-- Subjects Tab -->
             <TabItem Header="Môn tập cá nhân">
-                <Grid Margin="10">
+                <Grid Margin="15">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="2*"/>
@@ -73,45 +64,62 @@
 
                     <!-- List Subjects -->
                     <DockPanel Grid.Column="0" Margin="0,0,20,0">
-                        <TextBlock DockPanel.Dock="Top" Text="Danh sách môn tập" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                        <ListBox ItemsSource="{Binding Subjects}" SelectedItem="{Binding SelectedSubject}" BorderBrush="#DDD" HorizontalContentAlignment="Stretch">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="5">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="12" Foreground="Gray"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                            <Button Content="✏️ Sửa" Command="{Binding DataContext.EditSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                    CommandParameter="{Binding}" Padding="8,4" Margin="0,0,5,0"
-                                                    Background="#2196F3" Foreground="White" BorderThickness="0" Cursor="Hand"/>
-                                            <Button Content="🗑️ Xóa" Command="{Binding DataContext.RemoveSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    CommandParameter="{Binding}" Padding="8,4" Background="#FF5252" Foreground="White" BorderThickness="0" Cursor="Hand"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                        <TextBlock DockPanel.Dock="Top" Text="Danh sách môn tập" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                        <Grid>
+                            <DataGrid ItemsSource="{Binding Subjects}" SelectedItem="{Binding SelectedSubject}" 
+                                      Style="{StaticResource ModernDataGridStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Môn tập" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#333" HorizontalAlignment="Left"/>
+                                                    <TextBlock Text="{Binding Description}" FontSize="12" Foreground="#888" TextTrimming="CharacterEllipsis" MaxWidth="300" HorizontalAlignment="Left"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Thao tác" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content="Sửa" Style="{StaticResource ModernButtonStyle}"
+                                                            Command="{Binding DataContext.EditSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                            CommandParameter="{Binding}"
+                                                            Background="#E3F2FD" Foreground="#1976D2" Padding="8,4"/>
+                                                    <Button Content="Xóa" Style="{StaticResource ModernButtonStyle}"
+                                                            Command="{Binding DataContext.RemoveSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                            CommandParameter="{Binding}"
+                                                            Background="#FFEBEE" Foreground="#C62828" Margin="5,0,0,0" Padding="8,4"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
                     </DockPanel>
 
                     <!-- Create Subject -->
-                    <Border Grid.Column="1" Background="#F9F9F9" Padding="20">
+                    <Border Grid.Column="1" BorderBrush="#DDD" BorderThickness="1" Padding="15" VerticalAlignment="Top" Background="#F9F9F9">
                         <StackPanel>
-                            <TextBlock Text="Thêm môn tập mới" FontWeight="Bold" Margin="0,0,0,15"/>
+                            <TextBlock Text="Thêm môn tập mới" FontSize="16" FontWeight="Bold" Margin="0,0,0,15"/>
                             
-                            <TextBlock Text="Tên môn tập" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding NewSubjectName, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,10"/>
+                            <TextBlock Text="Tên môn tập" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#CCCCCC" BorderThickness="1" Height="36" Margin="0,0,0,10" Background="White">
+                                <TextBox Text="{Binding NewSubjectName, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource SearchTextBoxStyle}" Tag="Nhập tên môn tập..."/>
+                            </Border>
                             
-                            <TextBlock Text="Mô tả" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding NewSubjectDesc}" Padding="5" Margin="0,0,0,15" Height="60"/>
+                            <TextBlock Text="Mô tả" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#CCCCCC" BorderThickness="1" Margin="0,0,0,15" Background="White">
+                                <TextBox Text="{Binding NewSubjectDesc}" AcceptsReturn="True" TextWrapping="Wrap"
+                                         BorderThickness="0" Background="Transparent" Padding="8" MinHeight="80"/>
+                            </Border>
                             
                             <Button Content="Thêm Môn Tập" Command="{Binding AddSubjectCommand}" 
-                                    Padding="10" Background="#4CAF50" Foreground="White" BorderThickness="0"/>
+                                    Style="{StaticResource ModernButtonStyle}" Background="#4CAF50" Foreground="White" Padding="12,8"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -119,109 +127,182 @@
 
             <!-- Schedule/Calendar Tab -->
             <TabItem Header="Lịch tập cá nhân">
-                <Grid Margin="10">
+                <Grid Margin="15">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="280"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Sidebar Controls -->
                     <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                        <Calendar SelectedDate="{Binding SelectedDate}" Margin="0,0,0,20"/>
+                        <Border BorderBrush="#CCCCCC" BorderThickness="1" Margin="0,0,0,15" Padding="5" Background="White">
+                            <Calendar SelectedDate="{Binding SelectedDate}" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center"/>
+                        </Border>
                         
-                        <Border Background="#F9F9F9" Padding="15" CornerRadius="5">
-                            <StackPanel>
-                                <TextBlock Text="Thêm buổi tập" FontWeight="Bold" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="Tên buổi tập" Margin="0,0,0,5"/>
-                                <TextBox Text="{Binding NewSessionName, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="Môn tập" Margin="0,0,0,5"/>
-                                <ComboBox ItemsSource="{Binding Subjects}" SelectedItem="{Binding SelectedSubject}" DisplayMemberPath="Name" Margin="0,0,0,10" Padding="5"/>
-                                
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                                        <TextBlock Text="Bắt đầu" FontSize="11"/>
-                                        <TextBox Text="{Binding NewSessionStart}" Padding="5"/> 
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                        <TextBlock Text="Kết thúc" FontSize="11"/>
-                                        <TextBox Text="{Binding NewSessionEnd}" Padding="5"/>
-                                    </StackPanel>
-                                </Grid>
-                                
-                                <TextBlock Text="Ghi chú" Margin="0,0,0,5"/>
-                                <TextBox Text="{Binding NewSessionNote}" Padding="5" Margin="0,0,0,10"/>
-                                
-                                <Button Content="Thêm Buổi Tập" Command="{Binding AddSessionCommand}" 
-                                        Background="#2196F3" Foreground="White" Padding="10" 
-                                        BorderThickness="0" Margin="0,0,0,10"/>
+                        <Border BorderBrush="#DDD" BorderThickness="1" Background="#F9F9F9" Padding="15">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
+                                <StackPanel>
+                                    <TextBlock Text="Thêm buổi tập" FontSize="16" FontWeight="Bold" Foreground="#333" Margin="0,0,0,12"/>
+                                    
+                                    <TextBlock Text="Tên buổi tập" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,3"/>
+                                    <Border BorderBrush="#CCCCCC" BorderThickness="1" Height="32" Margin="0,0,0,10" Background="White">
+                                        <TextBox Text="{Binding NewSessionName, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Style="{StaticResource SearchTextBoxStyle}" Tag="VD: Tập luyện sáng..."/>
+                                    </Border>
+                                    
+                                    <TextBlock Text="Môn tập" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,3"/>
+                                    <ComboBox ItemsSource="{Binding Subjects}" SelectedItem="{Binding SelectedSubject}" 
+                                              DisplayMemberPath="Name" Margin="0,0,0,10" Height="32" VerticalContentAlignment="Center"/>
+                                    
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="10"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Bắt đầu" FontSize="11" Foreground="#333" Margin="0,0,0,2"/>
+                                            <Border BorderBrush="#CCCCCC" BorderThickness="1" Height="32">
+                                                <TextBox Text="{Binding NewSessionStart}" Style="{StaticResource SearchTextBoxStyle}" Tag="08:00"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Kết thúc" FontSize="11" Foreground="#333" Margin="0,0,0,2"/>
+                                            <Border BorderBrush="#CCCCCC" BorderThickness="1" Height="32">
+                                                <TextBox Text="{Binding NewSessionEnd}" Style="{StaticResource SearchTextBoxStyle}" Tag="10:00"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <TextBlock Text="Ghi chú" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,3"/>
+                                    <Border BorderBrush="#CCCCCC" BorderThickness="1" Margin="0,0,0,15" Background="White">
+                                        <TextBox Text="{Binding NewSessionNote}" Padding="5" BorderThickness="0" Background="Transparent" MinHeight="40"/>
+                                    </Border>
+                                    
+                                    <Button Content="Thêm Buổi Tập" Command="{Binding AddSessionCommand}" 
+                                            Style="{StaticResource ModernButtonStyle}" Background="#2196F3" Foreground="White" 
+                                            Height="36" Padding="12,0" Margin="0,0,0,10"/>
 
-                                <Button Content="Xuất Lịch (CSV)" Command="{Binding ExportScheduleCommand}"
-                                        Background="#FF9800" Foreground="White" Padding="10" BorderThickness="0"/>
-                            </StackPanel>
+                                    <Button Content="Xuất Lịch (CSV)" Command="{Binding ExportScheduleCommand}"
+                                            Style="{StaticResource ModernButtonStyle}" Background="#FF9800" Foreground="White" Height="36" Padding="12,0"/>
+                                </StackPanel>
+                            </ScrollViewer>
                         </Border>
                     </StackPanel>
 
                     <!-- Sessions List -->
                     <DockPanel Grid.Column="1">
                         <TextBlock DockPanel.Dock="Top" Text="{Binding ScheduleHeaderText}" 
-                                   FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
+                                   FontSize="18" FontWeight="Bold" Foreground="#1976D2" Margin="0,0,0,15"/>
                         
-                        <DataGrid ItemsSource="{Binding SessionViewItems}" AutoGenerateColumns="False" CanUserAddRows="False" 
-                                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" Background="White" BorderBrush="#EEE"
-                                  CanUserResizeColumns="True" SelectionMode="Single">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Ngày" Binding="{Binding Session.StartTime, StringFormat=dd/MM/yyyy}" Width="85" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Bắt đầu" Binding="{Binding Session.StartTime, StringFormat=HH:mm}" Width="65" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Kết thúc" Binding="{Binding Session.EndTime, StringFormat=HH:mm}" Width="65" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Tên buổi tập" Binding="{Binding Session.Name}" Width="*" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Môn" Binding="{Binding SubjectName}" Width="100" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Trạng thái" Binding="{Binding Status}" Width="100" IsReadOnly="True">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Status}" Value="Đang diễn ra">
-                                                    <Setter Property="Foreground" Value="#FF9800"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Status}" Value="Hoàn thành">
-                                                    <Setter Property="Foreground" Value="#4CAF50"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Status}" Value="Quá hạn">
-                                                    <Setter Property="Foreground" Value="#F44336"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
-                                <DataGridTemplateColumn Header="Điểm danh" Width="100">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Content="Điểm danh" 
-                                                    Command="{Binding DataContext.AttendSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    CommandParameter="{Binding}"
-                                                    Background="{Binding AttendanceColor}"
-                                                    IsEnabled="{Binding IsAttendanceEnabled}"
-                                                    Padding="10,5" BorderBrush="#CCC" BorderThickness="1" Cursor="Hand"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="50">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Content="🗑️" Command="{Binding DataContext.RemoveSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    CommandParameter="{Binding}" Background="Transparent" Foreground="Red" BorderThickness="0" FontSize="14" Cursor="Hand"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <Grid>
+                            <DataGrid ItemsSource="{Binding SessionViewItems}" Style="{StaticResource ModernDataGridStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Thời gian" Width="100">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Session.StartTime, StringFormat=dd/MM/yyyy}" FontWeight="SemiBold" Foreground="#333"/>
+                                                    <TextBlock FontSize="11" Foreground="#888">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}{0:HH:mm} - {1:HH:mm}">
+                                                                <Binding Path="Session.StartTime" />
+                                                                <Binding Path="Session.EndTime" />
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
 
+                                    <DataGridTemplateColumn Header="Nội dung" Width="250">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0">
+                                                    <TextBlock Text="{Binding Session.Name}" FontWeight="Bold" Foreground="#1976D2" HorizontalAlignment="Left"/>
+                                                    <TextBlock Text="{Binding SubjectName}" FontSize="11" Foreground="#888" HorizontalAlignment="Left"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Ghi chú" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Session.Note}" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                           Foreground="#666" Margin="10,0" TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Trạng thái" Width="130">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="10" Padding="8,2" HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="110" MinHeight="24">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#F5F5F5"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Đang diễn ra">
+                                                                    <Setter Property="Background" Value="#FFF3E0"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Hoàn thành">
+                                                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Quá hạn">
+                                                                    <Setter Property="Background" Value="#FFEBEE"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="#666666"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Đang diễn ra">
+                                                                        <Setter Property="Foreground" Value="#E65100"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Hoàn thành">
+                                                                        <Setter Property="Foreground" Value="#2E7D32"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Quá hạn">
+                                                                        <Setter Property="Foreground" Value="#C62828"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Thao tác" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Button Content="Điểm danh" 
+                                                            Command="{Binding DataContext.AttendSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource ModernButtonStyle}"
+                                                            Background="{Binding AttendanceColor}"
+                                                            Foreground="White"
+                                                            IsEnabled="{Binding IsAttendanceEnabled}"
+                                                            Padding="8,4" FontSize="11"/>
+                                                    
+                                                    <Button Content="🗑️" Style="{StaticResource ModernButtonStyle}"
+                                                            Command="{Binding DataContext.RemoveSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                            CommandParameter="{Binding}"
+                                                            Background="Transparent" Foreground="#C62828" FontSize="14" Margin="5,0,0,0" Padding="5"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
                     </DockPanel>
                 </Grid>
             </TabItem>

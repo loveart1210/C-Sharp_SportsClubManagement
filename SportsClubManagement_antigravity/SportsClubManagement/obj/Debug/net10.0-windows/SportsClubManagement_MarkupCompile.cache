@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 E:\Personal\Group Assignments\Lap_trinh_Windows\Antigravity_demo\SportsClubManagement_antigravity\SportsClubManagement\App.xaml
-17515556109
+21-441848807
 
-46-1488295176
+54-2033459228
 2201281181641
-MainWindow.xaml;Views\AttendanceView.xaml;Views\DashboardView.xaml;Views\LoginView.xaml;Views\PersonalScheduleView.xaml;Views\ProfileView.xaml;Views\ProfileWindow.xaml;Views\RegisterView.xaml;Views\TeamDetailView.xaml;Views\TeamFundsView.xaml;Views\TeamMembersView.xaml;Views\TeamNotificationsView.xaml;Views\TeamSessionsView.xaml;Views\TeamSettingsView.xaml;Views\TeamSubjectsView.xaml;Views\TeamsView.xaml;Views\UserManagementView.xaml;
+MainWindow.xaml;Themes\Styles.xaml;Views\AdminPanelView.xaml;Views\AdminTeamManagementView.xaml;Views\AttendanceView.xaml;Views\ChangePasswordWindow.xaml;Views\DashboardView.xaml;Views\LoginView.xaml;Views\PersonalScheduleView.xaml;Views\ProfileView.xaml;Views\ProfileWindow.xaml;Views\RegisterView.xaml;Views\TeamDetailView.xaml;Views\TeamFundsView.xaml;Views\TeamMembersView.xaml;Views\TeamNotificationsView.xaml;Views\TeamSessionsView.xaml;Views\TeamSettingsView.xaml;Views\TeamSubjectsView.xaml;Views\TeamsView.xaml;Views\UserManagementView.xaml;
 
 False
 

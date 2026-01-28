@@ -1,0 +1,110 @@
+<UserControl x:Class="SportsClubManagement.Views.AdminTeamManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000">
+    
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Controls -->
+            <RowDefinition Height="*"/>    <!-- DataGrid -->
+        </Grid.RowDefinitions>
+
+        <!-- Controls Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#CCCCCC" BorderThickness="1" Background="White" Width="350" Height="36" Margin="0,0,10,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔍" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#999"/>
+                        <TextBox Grid.Column="1" 
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource SearchTextBoxStyle}"
+                                 Tag="Tìm kiếm theo tên team, mô tả hoặc người tạo..."/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+            
+            <TextBlock Grid.Column="1" Text="{Binding Teams.Count, StringFormat='Tổng số Team: {0}'}" 
+                       VerticalAlignment="Center" Foreground="#666" FontWeight="SemiBold"/>
+        </Grid>
+
+        <!-- DataGrid Area -->
+        <Grid Grid.Row="1">
+            <DataGrid ItemsSource="{Binding Teams}" Style="{StaticResource ModernDataGridStyle}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Team" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="#1976D2" Margin="0,0,10,0">
+                                        <TextBlock Text="{Binding Team.Name[0]}" Foreground="White" 
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Team.Name}" FontWeight="Bold" Foreground="#333" FontSize="13"/>
+                                        <TextBlock Text="{Binding Team.Description}" FontSize="11" Foreground="#888" MaxWidth="400" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Người tạo" Width="180">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding FounderName}" FontWeight="SemiBold" Foreground="#444"/>
+                                    <TextBlock Text="{Binding Team.CreatedDate, StringFormat=dd/MM/yyyy}" FontSize="11" Foreground="#999"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Thành viên" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="👤" Margin="0,0,5,0" Foreground="#AAA" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding MemberCount}" Foreground="#333" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Mã tham gia" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="#F5F5F5" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left">
+                                    <TextBlock Text="{Binding Team.JoinCode}" FontFamily="Consolas" FontWeight="Bold" Foreground="#555"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Thao tác" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Xóa Team" Style="{StaticResource ModernButtonStyle}"
+                                        Command="{Binding DataContext.DeleteTeamCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                        CommandParameter="{Binding}"
+                                        Background="#FFEBEE" Foreground="#C62828" Padding="12,5"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>

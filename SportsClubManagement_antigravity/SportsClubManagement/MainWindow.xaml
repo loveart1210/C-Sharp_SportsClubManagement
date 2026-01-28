@@ -24,6 +24,12 @@
         <DataTemplate DataType="{x:Type vm:UserManagementViewModel}">
             <views:UserManagementView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AdminPanelViewModel}">
+            <views:AdminPanelView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AdminTeamManagementViewModel}">
+            <views:AdminTeamManagementView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:PersonalScheduleViewModel}">
             <views:PersonalScheduleView />
         </DataTemplate>
@@ -95,15 +101,12 @@
                                 Margin="10" Padding="12,10" HorizontalContentAlignment="Left" 
                                 Background="Transparent" Foreground="#333" FontSize="13" Cursor="Hand"/>
                         
-                        <Button Content="🔔 Thông báo" 
-                                Margin="10" Padding="12,10" HorizontalContentAlignment="Left" 
-                                Background="Transparent" Foreground="#999" FontSize="13" IsEnabled="False"/>
                         
                         <!-- Admin Section -->
                         <Separator Margin="10,20,10,10"/>
                         <TextBlock Text="ADMIN" Margin="10,0,10,10" Foreground="#999" FontSize="11" FontWeight="Bold"/>
                         
-                        <Button Content="👨‍💼 Quản lý User" Command="{Binding NavigateToAdminCommand}" 
+                        <Button Content="⚙️ Quản lý Hệ thống" Command="{Binding NavigateToAdminCommand}" 
                                 Margin="10" Padding="12,10" HorizontalContentAlignment="Left" 
                                 Background="Transparent" Foreground="#333" FontSize="13" Cursor="Hand"/>
                     </StackPanel>

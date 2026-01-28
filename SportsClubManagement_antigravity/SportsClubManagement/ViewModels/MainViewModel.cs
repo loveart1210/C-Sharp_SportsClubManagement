@@ -70,7 +70,7 @@ namespace SportsClubManagement.ViewModels
                 profileWindow.Owner = Application.Current.MainWindow;
                 profileWindow.ShowDialog();
             });
-            NavigateToAdminCommand = new RelayCommand(o => CurrentView = new UserManagementViewModel());
+            NavigateToAdminCommand = new RelayCommand(o => CurrentView = new AdminPanelViewModel());
             LogoutCommand = new RelayCommand(ExecuteLogout);
 
             // Default View

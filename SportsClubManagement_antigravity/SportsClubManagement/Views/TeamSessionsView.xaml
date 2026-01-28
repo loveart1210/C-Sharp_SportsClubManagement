@@ -5,165 +5,186 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conv="clr-namespace:SportsClubManagement.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="1200">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
-    <Grid Margin="10">
+    <Grid Margin="25">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="320"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="250"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Sidebar: Calendar & Add Session Form -->
-        <StackPanel Grid.Column="0" Margin="0,0,20,0">
-            <Calendar SelectedDate="{Binding SelectedDate}" Margin="0,0,0,20"/>
-            
-            <!-- Add Session Form (Founder/Coach Only) -->
-            <Border Background="#F9F9F9" Padding="15" CornerRadius="5" 
-                    Visibility="{Binding IsFounderOrCoach, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <StackPanel>
-                    <TextBlock Text="Thêm buổi tập" FontWeight="Bold" Margin="0,0,0,10"/>
-                    
-                    <TextBlock Text="Tên buổi tập" Margin="0,0,0,5"/>
-                    <TextBox Text="{Binding NewSessionName, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,10"/>
-                    
-                    <TextBlock Text="Môn tập" Margin="0,0,0,5"/>
-                    <ComboBox ItemsSource="{Binding AvailableSubjects}" SelectedItem="{Binding SelectedSubject}" DisplayMemberPath="Name" Margin="0,0,0,10" Padding="5"/>
-                    
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                            <TextBlock Text="Bắt đầu (HH:mm)" FontSize="11"/>
-                            <TextBox Text="{Binding NewSessionStartString}" Padding="5"/> 
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                            <TextBlock Text="Kết thúc (HH:mm)" FontSize="11"/>
-                            <TextBox Text="{Binding NewSessionEndString}" Padding="5"/>
-                        </StackPanel>
-                    </Grid>
-                    
-                    <TextBlock Text="Ghi chú" Margin="0,0,0,5"/>
-                    <TextBox Text="{Binding NewSessionNote}" Padding="5" Margin="0,0,0,10"/>
-
-                    <!-- Member Participation Button -->
-                    <Button Content="👥 Thành viên tham gia" Command="{Binding OpenMemberSelectionCommand}"
-                            Background="#607D8B" Foreground="White" Padding="10,5" BorderThickness="0" Margin="0,0,0,10"/>
-
-                    <Button Content="Thêm Buổi Tập" Command="{Binding AddSessionCommand}" 
-                            Background="#2196F3" Foreground="White" Padding="10" 
-                            BorderThickness="0" Margin="0,0,0,10"/>
-                </StackPanel>
+        <!-- Left Sidebar: Calendar & Form -->
+        <DockPanel Grid.Column="0" Margin="0,0,20,0">
+            <!-- Calendar Section -->
+            <Border DockPanel.Dock="Top" BorderBrush="#CCCCCC" BorderThickness="1" Margin="0,0,0,15" Padding="5" Background="White">
+                <Calendar SelectedDate="{Binding SelectedDate}" BorderThickness="0" Background="Transparent"/>
             </Border>
-
-             <!-- Export Button (Visible to ALL, but maybe different placement/style) -->
-            <Button Content="Xuất Lịch (CSV)" Command="{Binding ExportScheduleCommand}"
-                    Background="#FF9800" Foreground="White" Padding="10" BorderThickness="0" Margin="0,10,0,0"/>
-
-        </StackPanel>
-
-        <!-- Main: Sessions List -->
-        <DockPanel Grid.Column="1">
-            <TextBlock DockPanel.Dock="Top" Text="{Binding ScheduleHeaderText}" 
-                       FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
             
-            <DataGrid ItemsSource="{Binding Sessions}" AutoGenerateColumns="False" CanUserAddRows="False" 
-                      HeadersVisibility="Column" GridLinesVisibility="Horizontal" Background="White" BorderBrush="#EEE"
-                      CanUserResizeColumns="True" SelectionMode="Single" IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Ngày" Binding="{Binding StartTime, StringFormat=dd/MM/yyyy}" Width="85"/>
-                    <DataGridTextColumn Header="Bắt đầu" Binding="{Binding StartTime, StringFormat=HH:mm}" Width="65"/>
-                    <DataGridTextColumn Header="Kết thúc" Binding="{Binding EndTime, StringFormat=HH:mm}" Width="65"/>
-                    <DataGridTextColumn Header="Tên buổi tập" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTextColumn Header="Ghi chú" Binding="{Binding Note}" Width="150"/>
-                    
-                    <!-- Delete Action (Founder/Coach Only) -->
-                    <DataGridTemplateColumn Width="50">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="🗑️" Command="{Binding DataContext.RemoveSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                        CommandParameter="{Binding}" 
-                                        Visibility="{Binding DataContext.IsFounderOrCoach, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Background="Transparent" Foreground="Red" BorderThickness="0" FontSize="14" Cursor="Hand"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+            <!-- Quick Add Form -->
+            <Border BorderBrush="#DDD" BorderThickness="1" Background="#F9F9F9" Padding="15"
+                    Visibility="{Binding IsFounderOrCoach, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="📅 Thêm Buổi Tập" FontSize="18" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
+                        
+                        <TextBlock Text="Tên buổi tập" FontWeight="SemiBold" Foreground="#666" Margin="0,0,0,5"/>
+                        <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Height="35" Margin="0,0,0,10">
+                            <TextBox Text="{Binding NewSessionName, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource SearchTextBoxStyle}" Tag="VD: Tập luyện sáng..."/>
+                        </Border>
+                        
+                        <TextBlock Text="Môn tập" FontWeight="SemiBold" Foreground="#666" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding AvailableSubjects}" SelectedItem="{Binding SelectedSubject}" 
+                                  DisplayMemberPath="Name" Margin="0,0,0,10" Height="35" VerticalContentAlignment="Center"/>
+                        
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Bắt đầu" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                                <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Height="35">
+                                    <TextBox Text="{Binding NewSessionStartString}" Style="{StaticResource SearchTextBoxStyle}" Tag="08:00"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Kết thúc" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                                <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Height="35">
+                                    <TextBox Text="{Binding NewSessionEndString}" Style="{StaticResource SearchTextBoxStyle}" Tag="10:00"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <TextBlock Text="Ghi chú" FontWeight="SemiBold" Foreground="#666" Margin="0,0,0,5"/>
+                        <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Height="60" Margin="0,0,0,15">
+                            <TextBox Text="{Binding NewSessionNote}" AcceptsReturn="True" BorderThickness="0" Background="Transparent" Padding="8"/>
+                        </Border>
+
+                        <Button Content="👥 Chọn thành viên" Command="{Binding OpenMemberSelectionCommand}"
+                                Style="{StaticResource ModernButtonStyle}" Background="#607D8B" Foreground="White" Margin="0,0,0,10"/>
+
+                        <Button Content="Thêm Buổi Tập" Command="{Binding AddSessionCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="#2196F3" Foreground="White" Height="40"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
         </DockPanel>
 
-        <!-- Right Side: Filters (Vertical) -->
-        <Border Grid.Column="2" Margin="15,0,0,0" Background="#FAFAFA" BorderBrush="#EEE" BorderThickness="1,0,0,0" Padding="10">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="Bộ lọc" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+        <!-- Main Content: Sessions List -->
+        <DockPanel Grid.Column="1">
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,15">
+                <TextBlock Text="{Binding ScheduleHeaderText}" FontSize="24" FontWeight="Bold" Foreground="#1976D2" VerticalAlignment="Center"/>
+                <Button Content="Xuất CSV" Command="{Binding ExportScheduleCommand}"
+                        Style="{StaticResource ModernButtonStyle}" Background="#FF9800" Foreground="White" 
+                        HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,6"/>
+            </Grid>
+            
+            <Grid>
+                <DataGrid ItemsSource="{Binding Sessions}" Style="{StaticResource ModernDataGridStyle}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Thời gian" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Session.StartTime, StringFormat=dd/MM/yyyy}" FontWeight="SemiBold" Foreground="#333"/>
+                                        <TextBlock FontSize="11" Foreground="#888">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0:HH:mm} - {1:HH:mm}">
+                                                    <Binding Path="Session.StartTime" />
+                                                    <Binding Path="Session.EndTime" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="Trạng thái" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                        <ComboBox ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding FilterStatus}" VerticalContentAlignment="Center" Padding="5"/>
+                        <DataGridTemplateColumn Header="Buổi tập" Width="250">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0">
+                                        <TextBlock Text="{Binding Session.Name}" FontWeight="Bold" Foreground="#1976D2" HorizontalAlignment="Left"/>
+                                        <TextBlock Text="{Binding SubjectName}" FontSize="12" Foreground="#555" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Ghi chú" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Session.Note}" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                               Foreground="#444" Margin="10,0" TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Thao tác" Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="🗑️" Style="{StaticResource ModernButtonStyle}"
+                                            Command="{Binding DataContext.RemoveSessionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}"
+                                            Visibility="{Binding DataContext.IsFounderOrCoach, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Background="Transparent" Foreground="#C62828" FontSize="16"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </DockPanel>
+
+        <!-- Right Side: Filters -->
+        <Border Grid.Column="2" Margin="20,0,0,0" BorderBrush="#DDD" BorderThickness="1" Background="#F9F9F9" Padding="15">
+            <StackPanel>
+                <TextBlock Text="🔍 Bộ lọc" FontSize="18" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
+                
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Trạng thái" FontSize="11" Foreground="#666" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding FilterStatus}" Margin="0,0,0,10" Height="30" VerticalContentAlignment="Center"/>
+                        
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Ngày" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                                <ComboBox ItemsSource="{Binding DayOptions}" SelectedItem="{Binding FilterDay}" Height="30" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Tháng" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                                <ComboBox ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding FilterMonth}" Height="30" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <TextBlock Text="Năm" FontSize="11" Foreground="#666" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding YearOptions}" SelectedItem="{Binding FilterYear}" Margin="0,0,0,10" Height="30" VerticalContentAlignment="Center"/>
+                        
+                        <TextBlock Text="Môn tập" FontSize="11" Foreground="#666" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding SubjectNameOptions}" SelectedItem="{Binding FilterSubjectName}" Margin="0,0,0,15" Height="30" VerticalContentAlignment="Center"/>
+                        
+                        <Button Content="Xóa bộ lọc" Command="{Binding ClearFiltersCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="#9E9E9E" Foreground="White"/>
                     </StackPanel>
-                    
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Ngày" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                            <ComboBox ItemsSource="{Binding DayOptions}" SelectedItem="{Binding FilterDay}" VerticalContentAlignment="Center"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Tháng" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                            <ComboBox ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding FilterMonth}" VerticalContentAlignment="Center"/>
-                        </StackPanel>
-                    </Grid>
-                    
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="Năm" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                        <ComboBox ItemsSource="{Binding YearOptions}" SelectedItem="{Binding FilterYear}" VerticalContentAlignment="Center"/>
-                    </StackPanel>
-                    
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="Buổi tập" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                        <ComboBox ItemsSource="{Binding SessionNameOptions}" SelectedItem="{Binding FilterSessionName}" VerticalContentAlignment="Center"/>
-                    </StackPanel>
-                    
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="Môn" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                        <ComboBox ItemsSource="{Binding SubjectNameOptions}" SelectedItem="{Binding FilterSubjectName}" VerticalContentAlignment="Center"/>
-                    </StackPanel>
-                    
-                    <Grid Margin="0,0,0,10">
-                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Bắt đầu" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                            <ComboBox ItemsSource="{Binding StartTimeOptions}" SelectedItem="{Binding FilterStartTime}" VerticalContentAlignment="Center"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Kết thúc" FontSize="11" Foreground="Gray" Margin="0,0,0,5"/>
-                            <ComboBox ItemsSource="{Binding EndTimeOptions}" SelectedItem="{Binding FilterEndTime}" VerticalContentAlignment="Center"/>
-                        </StackPanel>
-                    </Grid>
-                    
-                    <Button Content="Xóa bộ lọc" Command="{Binding ClearFiltersCommand}" Margin="0,10,0,0" Padding="10,8" Background="#9E9E9E" Foreground="White" BorderThickness="0" Cursor="Hand"/>
-                </StackPanel>
-            </ScrollViewer>
+                </ScrollViewer>
+            </StackPanel>
         </Border>
 
-        <!-- Member Selection Modal Overlay -->
-        <Grid Grid.ColumnSpan="2" Background="#7F000000" Visibility="{Binding IsMemberSelectionVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Border Background="White" Width="500" Height="400" CornerRadius="10" Padding="20">
+        <!-- Member Selection Modal -->
+        <Grid Grid.ColumnSpan="3" Background="#7F000000" Visibility="{Binding IsMemberSelectionVisible, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="100">
+            <Border Style="{StaticResource CardBorderStyle}" Width="500" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -171,23 +192,23 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Text="Chọn thành viên tham gia" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                    <TextBlock Text="👥 Chọn thành viên tham gia" FontSize="20" FontWeight="Bold" Foreground="#1976D2" Margin="0,0,0,20"/>
                     
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding MemberSelectionList}" AutoGenerateColumns="False" CanUserAddRows="False" BorderBrush="#EEE">
-                        <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
-                            <DataGridTextColumn Header="Tên thành viên" Binding="{Binding FullName}" Width="*" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Vai trò" Binding="{Binding Role}" Width="100" IsReadOnly="True"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Border Grid.Row="1" BorderBrush="#EEE" BorderThickness="1" CornerRadius="5">
+                        <DataGrid ItemsSource="{Binding MemberSelectionList}" Style="{StaticResource ModernDataGridStyle}">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
+                                <DataGridTextColumn Header="Thành viên" Binding="{Binding FullName}" Width="*" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Vai trò" Binding="{Binding Role}" Width="100" IsReadOnly="True"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
                     
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                        <Button Content="Xong" Command="{Binding CloseMemberSelectionCommand}" 
-                                Background="#4CAF50" Foreground="White" Padding="20,10" BorderThickness="0"/>
-                    </StackPanel>
+                    <Button Grid.Row="2" Content="Xác nhận" Command="{Binding CloseMemberSelectionCommand}" 
+                            Style="{StaticResource ModernButtonStyle}" Background="#4CAF50" Foreground="White" 
+                            HorizontalAlignment="Right" Margin="0,20,0,0" Width="100" Height="40"/>
                 </Grid>
             </Border>
         </Grid>
-
     </Grid>
 </UserControl>

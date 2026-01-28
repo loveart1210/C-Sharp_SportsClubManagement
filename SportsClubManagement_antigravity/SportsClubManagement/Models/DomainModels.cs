@@ -14,6 +14,7 @@ namespace SportsClubManagement.Models
         public string AvatarPath { get; set; } = string.Empty;
         public DateTime BirthDate { get; set; } = DateTime.Now;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public bool MustChangePassword { get; set; } = false;
     }
 
     public class TeamMember

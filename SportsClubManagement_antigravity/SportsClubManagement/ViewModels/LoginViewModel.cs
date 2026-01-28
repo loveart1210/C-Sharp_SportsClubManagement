@@ -73,10 +73,21 @@ namespace SportsClubManagement.ViewModels
                 return;
             }
 
-            var user = DataService.Instance.Users.FirstOrDefault(u => u.Username == Username && u.Password == Password);
+            var user = DataService.Instance.Users.FirstOrDefault(u => u.Username == Username);
 
-            if (user != null)
+            if (user != null && PasswordHasher.Verify(Password, user.Password))
             {
+                if (user.MustChangePassword)
+                {
+                    var changeWindow = new Views.ChangePasswordWindow(user);
+                    bool? result = changeWindow.ShowDialog();
+                    if (result != true)
+                    {
+                        ErrorMessage = "Bắt buộc phải đổi mật khẩu để tiếp tục.";
+                        return;
+                    }
+                }
+
                 DataService.Instance.CurrentUser = user;
                 OnLoginSuccess?.Invoke(this, EventArgs.Empty);
             }

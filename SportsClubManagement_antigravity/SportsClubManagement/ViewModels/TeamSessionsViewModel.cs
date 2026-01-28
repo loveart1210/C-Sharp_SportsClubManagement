@@ -11,7 +11,7 @@ namespace SportsClubManagement.ViewModels
     public class TeamSessionsViewModel : ViewModelBase
     {
         private Team? _team;
-        private ObservableCollection<Session>? _sessions;
+        private ObservableCollection<SessionViewItem>? _sessions;
         private DateTime _selectedDate;
         private ObservableCollection<Subject>? _availableSubjects;
         private string _newSessionName = string.Empty;
@@ -23,7 +23,7 @@ namespace SportsClubManagement.ViewModels
         private bool _isMemberSelectionVisible;
         private ObservableCollection<MemberSelectionItem>? _memberSelectionList;
 
-        public ObservableCollection<Session>? Sessions
+        public ObservableCollection<SessionViewItem>? Sessions
         {
             get => _sessions;
             set => SetProperty(ref _sessions, value);
@@ -297,7 +297,10 @@ namespace SportsClubManagement.ViewModels
                 filtered = filtered.Where(s => s.EndTime.ToString("HH:mm") == FilterEndTime);
 
             var list = filtered.OrderBy(s => s.StartTime).ToList();
-            Sessions = new ObservableCollection<Session>(list);
+            var subjects = DataService.Instance.Subjects.ToDictionary(s => s.Id, s => s.Name);
+            Sessions = new ObservableCollection<SessionViewItem>(
+                list.Select(s => new SessionViewItem(s, subjects.ContainsKey(s.SubjectId) ? subjects[s.SubjectId] : "Unknown"))
+            );
             
             OnPropertyChanged(nameof(IsFounderOrCoach));
         }
@@ -388,8 +391,9 @@ namespace SportsClubManagement.ViewModels
 
         private void RemoveSession(object? obj)
         {
-            if (obj is Session s)
+            if (obj is SessionViewItem item)
             {
+                var s = item.Session;
                  var result = System.Windows.MessageBox.Show($"Bạn có chắc chắn muốn xóa buổi tập '{s.Name}'?", "Xác nhận", 
                     System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question);
                 
@@ -422,6 +426,7 @@ namespace SportsClubManagement.ViewModels
             }
         }
     }
+
 
     public class MemberSelectionItem : ViewModelBase
     {

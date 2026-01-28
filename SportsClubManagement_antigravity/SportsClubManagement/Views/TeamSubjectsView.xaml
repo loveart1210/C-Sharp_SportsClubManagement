@@ -5,110 +5,111 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conv="clr-namespace:SportsClubManagement.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="1000">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
-        
-        <Style x:Key="WatermarkTextBoxStyle" TargetType="{x:Type TextBox}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TextBox}">
-                        <Border Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <Grid>
-                                <ScrollViewer x:Name="PART_ContentHost" />
-                                <TextBlock Text="{TemplateBinding Tag}" 
-                                           Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center"
-                                           IsHitTestVisible="False">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" Value="">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
-    <Grid Margin="10">
+
+    <Grid Margin="25">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1.5*"/>
         </Grid.ColumnDefinitions>
 
         <!-- List Subjects -->
         <DockPanel Grid.Column="0" Margin="0,0,20,0">
-            <!-- Search & Filter -->
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBox Width="200" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                         Padding="5" Tag="Tìm kiếm môn tập..." Margin="0,0,10,0"
-                         Style="{StaticResource WatermarkTextBoxStyle}"/>
+            <!-- Header & Search -->
+            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
+                <TextBlock Text="Danh sách môn tập" FontSize="24" FontWeight="Bold" Foreground="#1976D2" Margin="0,0,0,15"/>
+                
+                <Border BorderBrush="#CCCCCC" BorderThickness="1" Background="White" Width="300" Height="36" HorizontalAlignment="Left">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔍" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#999"/>
+                        <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource SearchTextBoxStyle}" Tag="Tìm kiếm môn tập..."/>
+                    </Grid>
+                </Border>
             </StackPanel>
 
-            <TextBlock DockPanel.Dock="Top" Text="Danh sách môn tập" FontWeight="SemiBold" Margin="0,0,0,10"/>
-            
-            <ListBox ItemsSource="{Binding Subjects}" SelectedItem="{Binding SelectedSubject}" BorderBrush="#DDD" HorizontalContentAlignment="Stretch">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Description}" FontSize="12" Foreground="Gray"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding DataContext.IsFounderOrCoach, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <Button Content="✏️ Sửa" Command="{Binding DataContext.EditSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}" Padding="8,4" Margin="0,0,5,0"
-                                        Background="#2196F3" Foreground="White" BorderThickness="0" Cursor="Hand"/>
-                                <Button Content="🗑️ Xóa" Command="{Binding DataContext.RemoveSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                        CommandParameter="{Binding}" Padding="8,4" Background="#FF5252" Foreground="White" BorderThickness="0" Cursor="Hand"/>
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Grid>
+                <DataGrid ItemsSource="{Binding Subjects}" SelectedItem="{Binding SelectedSubject}" 
+                          Style="{StaticResource ModernDataGridStyle}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Môn tập" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0">
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#333" HorizontalAlignment="Left"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="12" Foreground="#888" TextTrimming="CharacterEllipsis" MaxWidth="300" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Thao tác" Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding DataContext.IsFounderOrCoach, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Button Content="Sửa" Style="{StaticResource ModernButtonStyle}"
+                                                Command="{Binding DataContext.EditSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                CommandParameter="{Binding}"
+                                                Background="#E3F2FD" Foreground="#1976D2" Padding="8,4"/>
+                                        <Button Content="Xóa" Style="{StaticResource ModernButtonStyle}"
+                                                Command="{Binding DataContext.RemoveSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                CommandParameter="{Binding}"
+                                                Background="#FFEBEE" Foreground="#C62828" Margin="5,0,0,0" Padding="8,4"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </DockPanel>
 
-        <!-- Create/Edit Subject (Only visible to Founder/Coach) -->
-        <Border Grid.Column="1" Background="#F9F9F9" Padding="20" 
+        <!-- Create/Edit Subject Form -->
+        <Border Grid.Column="1" BorderBrush="#DDD" BorderThickness="1" Padding="15" VerticalAlignment="Top" Background="#F9F9F9"
                 Visibility="{Binding IsFounderOrCoach, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel>
-                <TextBlock Text="{Binding FormTitle}" FontWeight="Bold" Margin="0,0,0,15"/>
+                <TextBlock Text="{Binding FormTitle}" FontSize="18" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
                 
-                <TextBlock Text="Tên môn tập" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding NewSubjectName, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,10"/>
+                <TextBlock Text="Tên môn tập" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                <Border BorderBrush="#CCCCCC" BorderThickness="1" Height="36" Margin="0,0,0,10" Background="White">
+                    <TextBox Text="{Binding NewSubjectName, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource SearchTextBoxStyle}" Tag="Nhập tên môn tập..."/>
+                </Border>
                 
-                <TextBlock Text="Mô tả" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding NewSubjectDesc}" Padding="5" Margin="0,0,0,15" Height="60"/>
+                <TextBlock Text="Mô tả" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                <Border BorderBrush="#CCCCCC" BorderThickness="1" Margin="0,0,0,15" Background="White">
+                    <TextBox Text="{Binding NewSubjectDesc}" AcceptsReturn="True" TextWrapping="Wrap"
+                             BorderThickness="0" Background="Transparent" Padding="8" MinHeight="80"/>
+                </Border>
                 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                      <Button Content="Hủy" Command="{Binding CancelEditCommand}" 
                             Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Padding="10" Background="Gray" Foreground="White" BorderThickness="0" Margin="0,0,10,0"/>
+                            Style="{StaticResource ModernButtonStyle}" Background="#E0E0E0" Foreground="#333" Margin="0,0,10,0" Padding="12,6"/>
                 
                     <Button Content="{Binding ButtonText}" Command="{Binding AddSubjectCommand}" 
-                            Padding="10" Background="#4CAF50" Foreground="White" BorderThickness="0"/>
+                            Style="{StaticResource ModernButtonStyle}" Background="#4CAF50" Foreground="White" MinWidth="80" Padding="12,6"/>
                 </StackPanel>
             </StackPanel>
         </Border>
         
-        <!-- Read-only View for Members (Optional info or just empty space) -->
-        <Border Grid.Column="1" Background="#F9F9F9" Padding="20" 
+        <!-- Member Read-only Mode -->
+        <Border Grid.Column="1" BorderBrush="#DDD" BorderThickness="1" Padding="15" VerticalAlignment="Top" Background="#F9F9F9"
                 Visibility="{Binding IsFounderOrCoach, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-             <TextBlock Text="Bạn chỉ có quyền xem danh sách môn tập." FontStyle="Italic" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+             <StackPanel>
+                 <TextBlock Text="Thông tin" FontSize="18" FontWeight="Bold" Foreground="#333" Margin="0,0,0,10"/>
+                 <TextBlock Text="Bạn đang xem danh sách môn tập của team." Foreground="#666" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                 <TextBlock Text="Chỉ Người sáng lập hoặc Huấn luyện viên mới có quyền chỉnh sửa." 
+                            FontStyle="Italic" Foreground="#888" TextWrapping="Wrap" FontSize="11"/>
+             </StackPanel>
         </Border>
     </Grid>
 </UserControl>

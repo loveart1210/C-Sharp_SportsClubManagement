@@ -44,7 +44,13 @@ namespace SportsClubManagement.ViewModels
         public bool IsDeposit
         {
             get => _isDeposit;
-            set => SetProperty(ref _isDeposit, value);
+            set 
+            {
+                if (SetProperty(ref _isDeposit, value))
+                {
+                    OnPropertyChanged(nameof(Amount)); // Trigger re-eval of command if needed
+                }
+            }
         }
 
         public bool IsFounder => DataService.Instance.CurrentUser != null && 
@@ -75,11 +81,19 @@ namespace SportsClubManagement.ViewModels
             
             Transactions = new ObservableCollection<FundTransaction>(transactions);
             TotalBalance = _team.Balance;
+            OnPropertyChanged(nameof(IsFounder));
         }
 
         private bool CanTransaction()
         {
-            return IsFounder && Amount > 0 && !string.IsNullOrWhiteSpace(Description);
+            bool basicValidation = IsFounder && Amount > 0 && !string.IsNullOrWhiteSpace(Description);
+            if (!basicValidation) return false;
+
+            // If withdrawing, check if balance is sufficient
+            if (!IsDeposit && _team.Balance < Amount)
+                return false;
+
+            return true;
         }
 
         private void Deposit()

@@ -4,42 +4,151 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:SportsClubManagement.ViewModels"
+             xmlns:conv="clr-namespace:SportsClubManagement.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="900">
-    <UserControl.DataContext>
-        <vm:UserManagementViewModel />
-    </UserControl.DataContext>
+             d:DesignHeight="600" d:DesignWidth="1000">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
 
-    <Grid>
+    <Grid Margin="0,15,0,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- Controls -->
+            <RowDefinition Height="Auto"/> <!-- Temp Password Banner -->
+            <RowDefinition Height="*"/>    <!-- DataGrid -->
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <TextBlock Text="👨‍💼 Quản lý Users (Admin)" FontSize="24" FontWeight="Bold" 
-                   Foreground="#1976D2" Margin="0,0,0,20"/>
+        <!-- Controls Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <!-- Users DataGrid -->
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserAddRows="False"
-                  Background="White" BorderBrush="#E0E0E0" BorderThickness="1">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding Username}" Width="150"/>
-                <DataGridTextColumn Header="Họ tên" Binding="{Binding FullName}" Width="200"/>
-                <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="100"/>
-                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
-                <DataGridTemplateColumn Header="Hành động" Width="150">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Reset Mật khẩu" 
-                                    Command="{Binding DataContext.ResetPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                    CommandParameter="{Binding}" 
-                                    Padding="8,5"
-                                    Background="#FF9800" Foreground="White" Cursor="Hand" FontSize="11"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#CCCCCC" BorderThickness="1" Background="White" Width="300" Height="36" Margin="0,0,10,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔍" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#999"/>
+                        <TextBox Grid.Column="1" 
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource SearchTextBoxStyle}"
+                                 Tag="Tìm kiếm người dùng..."/>
+                    </Grid>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Vai trò:" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="#333"/>
+                    <ComboBox SelectedValue="{Binding FilterRole}" SelectedValuePath="Content" Width="100" Height="36" VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="All"/>
+                        <ComboBoxItem Content="Admin"/>
+                        <ComboBoxItem Content="User"/>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+            
+            <TextBlock Grid.Column="1" Text="{Binding Users.Count, StringFormat='Tổng số: {0}'}" 
+                       VerticalAlignment="Center" Foreground="#666"/>
+        </Grid>
+
+        <!-- Temporary Password Banner -->
+        <Border Grid.Row="1" Background="#FFF9C4" BorderBrush="#FBC02D" BorderThickness="1" 
+                Padding="10" Margin="0,0,0,15"
+                Visibility="{Binding ShowTempPassword, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" Text="🔑" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="Mật khẩu đã được reset thành công!" FontWeight="Bold" Foreground="#856404"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                        <TextBlock Text="Mật khẩu tạm thời: " Foreground="#856404"/>
+                        <TextBlock Text="{Binding TempPassword}" FontWeight="Bold" Foreground="#D32F2F"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Grid.Column="2" Content="✕" Command="{Binding CloseTempPasswordCommand}"
+                        Background="Transparent" BorderBrush="Transparent" Foreground="#856404"
+                        Cursor="Hand" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- DataGrid Area -->
+        <Grid Grid.Row="2">
+            <DataGrid ItemsSource="{Binding Users}" Style="{StaticResource ModernDataGridStyle}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Người dùng" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="14" Background="#1976D2" Margin="0,0,8,0">
+                                        <TextBlock Text="{Binding FullName[0]}" Foreground="White" 
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="12"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding FullName}" FontWeight="Bold" Foreground="#333"/>
+                                        <TextBlock Text="{Binding Username}" FontSize="11" Foreground="#888"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Vai trò" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Padding="6,2" CornerRadius="4" HorizontalAlignment="Left">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Role}" Value="Admin">
+                                                    <Setter Property="Background" Value="#E1F5FE"/>
+                                                    <Setter Property="Tag" Value="#0288D1"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Role}" Value="User">
+                                                    <Setter Property="Background" Value="#F5F5F5"/>
+                                                    <Setter Property="Tag" Value="#757575"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding Role}" Foreground="{Binding Tag, RelativeSource={RelativeSource AncestorType=Border}}" 
+                                               FontSize="11" FontWeight="SemiBold"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
+
+                    <DataGridTemplateColumn Header="Thao tác" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Reset" Style="{StaticResource ModernButtonStyle}"
+                                            Command="{Binding DataContext.ResetPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}"
+                                            Background="#FFF3E0" Foreground="#E65100" Padding="8,4"/>
+                                    
+                                    <Button Content="Xóa" Style="{StaticResource ModernButtonStyle}"
+                                            Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}"
+                                            Background="#FFEBEE" Foreground="#C62828" Margin="5,0,0,0" Padding="8,4"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </UserControl>
